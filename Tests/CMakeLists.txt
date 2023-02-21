@@ -18,7 +18,8 @@ if (PHREEQCRM_FORTRAN_TESTING)
   
   add_library(FortranAdvect STATIC ${FortranAdvect_SOURCES})
   
-  set_target_properties(FortranAdvect PROPERTIES COMPILE_DEFINITIONS "TEST_FORTRAN")
+  ##set_target_properties(FortranAdvect PROPERTIES COMPILE_DEFINITIONS "TEST_FORTRAN")
+  target_compile_definitions(FortranAdvect PRIVATE TEST_FORTRAN)
 endif()
 
 project(TestRM CXX)
@@ -54,15 +55,23 @@ SET(TestRM_SOURCES
 add_executable(TestRM ${TestRM_SOURCES})
 
 if (PHREEQCRM_FORTRAN_TESTING)
-  set_target_properties(TestRM PROPERTIES COMPILE_DEFINITIONS "TEST_FORTRAN")
+  ##set_target_properties(TestRM PROPERTIES COMPILE_DEFINITIONS "TEST_FORTRAN")
+  target_compile_definitions(TestRM PRIVATE TEST_FORTRAN)
 endif ()
 
 # library dependencies
 if (PHREEQCRM_FORTRAN_TESTING)
+  target_link_libraries(TestRM PUBLIC PhreeqcRM)
+  target_link_libraries(TestRM PUBLIC FortranAdvect)
   if (PHREEQCRM_BUILD_MPI)
-    SET(EXTRA_LIBS ${EXTRA_LIBS} FortranAdvect PhreeqcRM ${MPI_CXX_LIBRARIES} ${MPI_Fortran_LIBRARIES})
+    ##SET(EXTRA_LIBS ${EXTRA_LIBS} FortranAdvect PhreeqcRM ${MPI_CXX_LIBRARIES} ${MPI_Fortran_LIBRARIES})
+    ##SET(EXTRA_LIBS ${EXTRA_LIBS} FortranAdvect ${MPI_CXX_LIBRARIES} ${MPI_Fortran_LIBRARIES})
+    target_compile_definitions(FortranAdvect PRIVATE USE_MPI)
+    target_link_libraries(TestRM PUBLIC MPI::MPI_CXX)
+    target_include_directories(FortranAdvect PUBLIC ${MPI_Fortran_INCLUDE_DIRS})
   else ()
-    SET(EXTRA_LIBS ${EXTRA_LIBS} FortranAdvect PhreeqcRM)
+    ##SET(EXTRA_LIBS ${EXTRA_LIBS} FortranAdvect PhreeqcRM)
+    SET(EXTRA_LIBS ${EXTRA_LIBS} FortranAdvect)
   endif ()
   # Override bug reported on:
   # http://www.cmake.org/pipermail/cmake/2009-July/030954.html
@@ -73,7 +82,12 @@ if (PHREEQCRM_FORTRAN_TESTING)
   endif()
 else ()
   if (PHREEQCRM_BUILD_MPI)
-    SET(EXTRA_LIBS ${EXTRA_LIBS} PhreeqcRM ${MPI_CXX_LIBRARIES})
+    ####SET(EXTRA_LIBS ${EXTRA_LIBS} PhreeqcRM ${MPI_CXX_LIBRARIES})
+    ##SET(EXTRA_LIBS ${EXTRA_LIBS} PhreeqcRM)
+    target_link_libraries(TestRM PUBLIC PhreeqcRM)
+    target_compile_definitions(TestRM PRIVATE USE_MPI)
+    ##target_include_directories(TestRM PUBLIC ${MPI_CXX_INCLUDE_PATH})
+    target_link_libraries(TestRM PUBLIC MPI::MPI_CXX)
   else ()
     SET(EXTRA_LIBS ${EXTRA_LIBS} PhreeqcRM)
   endif ()
@@ -83,7 +97,8 @@ endif ()
 if (PHREEQCRM_USE_ZLIB AND ZLIB_FOUND)
   set(EXTRA_LIBS ${EXTRA_LIBS} ${ZLIB_LIBRARIES})
 endif()
-target_link_libraries(TestRM ${EXTRA_LIBS})
+##target_link_libraries(TestRM ${EXTRA_LIBS})
+##target_link_libraries(TestRM PUBLIC ${EXTRA_LIBS})
 
 # test compile and run
 add_test(TestCompileAndRun TestRM)
@@ -93,6 +108,11 @@ if (MSVC AND BUILD_SHARED_LIBS)
   add_custom_command(TARGET TestRM POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:PhreeqcRM> $<TARGET_FILE_DIR:TestRM>
   )
+  if (PHREEQCRM_USE_ZLIB)
+    add_custom_command(TARGET TestRM POST_BUILD
+      COMMAND ${CMAKE_COMMAND} -E echo "When running tests you may need to copy the zlib.dll to the Tests directory: $<TARGET_FILE_DIR:TestRM>"
+    )
+  endif()
 endif()
 
 

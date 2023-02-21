@@ -2,6 +2,21 @@ cmake_minimum_required (VERSION 3.10)
 
 project (PhreeqcRM CXX C)
 
+function (ixm::exit variable access value current stack)
+  message(STATUS "variable=${variable}")
+  message(STATUS "access=${access}")
+  message(STATUS "value=${value}")
+  message(STATUS "current=${current}")
+  message(STATUS "stack=${stack}")
+  if (NOT(access MATCHES "READ_ACCESS"))
+    ##message(FATAL_ERROR "STOPPING")
+  endif()
+endfunction()
+##variable_watch(MPI_Fortran_F77_HEADER_DIR ixm::exit)
+##variable_watch(MPI_FORTRAN_FOUND ixm::exit)
+##variable_watch(MPI_Fortran_WORKS ixm::exit)
+variable_watch(MPI_RESULT_Fortran_test_mpi_F77_HEADER ixm::exit)
+
 # check if this is the root project
 if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
   set(STANDALONE_BUILD 1)
@@ -22,16 +37,16 @@ endif()
 
 include(GNUInstallDirs)
 
-# iphreeqc defs
-ADD_DEFINITIONS(-DSWIG_SHARED_OBJ)
-ADD_DEFINITIONS(-DUSE_PHRQ_ALLOC)
+### iphreeqc defs
+##ADD_DEFINITIONS(-DSWIG_SHARED_OBJ)
+##ADD_DEFINITIONS(-DUSE_PHRQ_ALLOC)
 
-# Disable deprecation warnings for standard C and STL functions in VS2005
-# and later
-IF(MSVC_VERSION EQUAL 1400 OR MSVC_VERSION GREATER 1400)
-  ADD_DEFINITIONS(-D_CRT_SECURE_NO_DEPRECATE)
-  ADD_DEFINITIONS(-D_SCL_SECURE_NO_WARNINGS)
-ENDIF(MSVC_VERSION EQUAL 1400 OR MSVC_VERSION GREATER 1400) 
+### Disable deprecation warnings for standard C and STL functions in VS2005
+### and later
+##IF(MSVC_VERSION EQUAL 1400 OR MSVC_VERSION GREATER 1400)
+##  ADD_DEFINITIONS(-D_CRT_SECURE_NO_DEPRECATE)
+##  ADD_DEFINITIONS(-D_SCL_SECURE_NO_WARNINGS)
+##ENDIF(MSVC_VERSION EQUAL 1400 OR MSVC_VERSION GREATER 1400) 
 
 # check for zlib
 if(NOT ZLIB_ROOT)
@@ -44,10 +59,10 @@ if (PHREEQCRM_USE_ZLIB)
   find_package(ZLIB REQUIRED)
 endif()
 
-if (PHREEQCRM_USE_ZLIB AND ZLIB_FOUND)
-  ADD_DEFINITIONS(-DUSE_GZ)
-  include_directories(${ZLIB_INCLUDE_DIRS})
-endif()
+##if (PHREEQCRM_USE_ZLIB AND ZLIB_FOUND)
+##  ADD_DEFINITIONS(-DUSE_GZ)
+##  include_directories(${ZLIB_INCLUDE_DIRS})
+##endif()
 
 option(PHREEQCRM_DISABLE_OPENMP "Disable openmp" "OFF")
 if (NOT PHREEQCRM_DISABLE_OPENMP)
@@ -60,6 +75,7 @@ endif()
 # check for MPI
 option(PHREEQCRM_BUILD_MPI "Build MPI configuration" "OFF")
 if (PHREEQCRM_BUILD_MPI)
+  set(MPI_GUESS_LIBRARY_NAME MSMPI)
   find_package(MPI)
 endif (PHREEQCRM_BUILD_MPI)
 
@@ -225,13 +241,13 @@ src/RM_interface_F.cpp
 src/RM_interface_F.h
 )
 
-# setup include directories
-include_directories("${PROJECT_SOURCE_DIR}/src")
-include_directories("${PROJECT_SOURCE_DIR}/src/IPhreeqcPhast")
-include_directories("${PROJECT_SOURCE_DIR}/src/IPhreeqcPhast/IPhreeqc")
-include_directories("${PROJECT_SOURCE_DIR}/src/IPhreeqcPhast/IPhreeqc/phreeqcpp")
-include_directories("${PROJECT_SOURCE_DIR}/src/IPhreeqcPhast/IPhreeqc/phreeqcpp/common")
-include_directories("${PROJECT_SOURCE_DIR}/src/IPhreeqcPhast/IPhreeqc/phreeqcpp/PhreeqcKeywords")
+### setup include directories
+##include_directories("${PROJECT_SOURCE_DIR}/src")
+##include_directories("${PROJECT_SOURCE_DIR}/src/IPhreeqcPhast")
+##include_directories("${PROJECT_SOURCE_DIR}/src/IPhreeqcPhast/IPhreeqc")
+##include_directories("${PROJECT_SOURCE_DIR}/src/IPhreeqcPhast/IPhreeqc/phreeqcpp")
+##include_directories("${PROJECT_SOURCE_DIR}/src/IPhreeqcPhast/IPhreeqc/phreeqcpp/common")
+##include_directories("${PROJECT_SOURCE_DIR}/src/IPhreeqcPhast/IPhreeqc/phreeqcpp/PhreeqcKeywords")
 
 # dll/shared objects
 OPTION(BUILD_SHARED_LIBS "Build Shared Libraries" OFF)
@@ -240,16 +256,65 @@ if (BUILD_SHARED_LIBS)
   SET(LIB_TYPE SHARED)
 endif()
 add_library(PhreeqcRM ${LIB_TYPE} ${PhreeqcRM_SOURCES})
+
+# setup include directories
+target_include_directories(PhreeqcRM
+  PUBLIC
+  $<BUILD_INTERFACE:${PhreeqcRM_SOURCE_DIR}/src>
+  $<BUILD_INTERFACE:${PhreeqcRM_SOURCE_DIR}/src/IPhreeqcPhast>
+  $<BUILD_INTERFACE:${PhreeqcRM_SOURCE_DIR}/src/IPhreeqcPhast/IPhreeqc>
+  $<BUILD_INTERFACE:${PhreeqcRM_SOURCE_DIR}/src/IPhreeqcPhast/IPhreeqc/phreeqcpp>
+  $<BUILD_INTERFACE:${PhreeqcRM_SOURCE_DIR}/src/IPhreeqcPhast/IPhreeqc/phreeqcpp/common>
+  $<BUILD_INTERFACE:${PhreeqcRM_SOURCE_DIR}/src/IPhreeqcPhast/IPhreeqc/phreeqcpp/PhreeqcKeywords>
+  $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
+  )
+
+##{{
+# Disable deprecation warnings for standard C and STL functions in VS2005
+# and later
+if (MSVC_VERSION EQUAL 1400 OR MSVC_VERSION GREATER 1400)
+  target_compile_definitions(PhreeqcRM PUBLIC _CRT_SECURE_NO_DEPRECATE)
+  target_compile_definitions(PhreeqcRM PUBLIC _SCL_SECURE_NO_WARNINGS)
+endif()
+##}}
+
+
 set_target_properties(PhreeqcRM PROPERTIES DEBUG_POSTFIX "d")
+##{{
+set_target_properties(PhreeqcRM PROPERTIES MINSIZEREL_POSTFIX "msr")
+set_target_properties(PhreeqcRM PROPERTIES RELWITHDEBINFO_POSTFIX "rwd")
+##}}
+
+
+# PhreeqcRM req'd defines
+target_compile_definitions(PhreeqcRM PRIVATE SWIG_SHARED_OBJ)
+target_compile_definitions(PhreeqcRM PRIVATE USE_PHRQ_ALLOC)
+if (BUILD_SHARED_LIBS)
+  target_compile_definitions(PhreeqcRM PRIVATE IPhreeqc_EXPORTS)
+endif()
 
 # At least with MSMPI PhreeqcRM.dll requires MPI_CXX_LIBRARIES to link
 if (MSVC AND BUILD_SHARED_LIBS AND PHREEQCRM_BUILD_MPI)
-  target_link_libraries(PhreeqcRM ${MPI_CXX_LIBRARIES})
+  ##target_link_libraries(PhreeqcRM PUBLIC ${MPI_CXX_LIBRARIES})
+  target_link_libraries(PhreeqcRM PUBLIC MPI::MPI_CXX)
 endif()
 
-if (MSVC AND BUILD_SHARED_LIBS AND PHREEQCRM_USE_ZLIB AND ZLIB_FOUND)
-  target_link_libraries(PhreeqcRM ${ZLIB_LIBRARIES})
+# zlib
+if (PHREEQCRM_USE_ZLIB AND ZLIB_FOUND)
+  target_compile_definitions(PhreeqcRM PRIVATE USE_GZ)
+  target_include_directories(PhreeqcRM PRIVATE ${ZLIB_INCLUDE_DIRS})
 endif()
+if (MSVC AND BUILD_SHARED_LIBS AND PHREEQCRM_USE_ZLIB AND ZLIB_FOUND)
+  target_link_libraries(PhreeqcRM PUBLIC ${ZLIB_LIBRARIES})
+endif()
+
+##{{
+# openmp
+if (NOT PHREEQCRM_DISABLE_OPENMP AND OpenMP_CXX_FOUND)
+  target_link_libraries(PhreeqcRM PUBLIC OpenMP::OpenMP_CXX)
+endif()
+##}}
+
 
 SET(PhreeqcRM_Headers
 ${PROJECT_SOURCE_DIR}/src/IPhreeqcPhast/IPhreeqc/IPhreeqc.h
@@ -277,8 +342,10 @@ ${PROJECT_SOURCE_DIR}/src/IPhreeqcPhast/IPhreeqc/IPhreeqc_interface.F90
 )
 
 if (PHREEQCRM_BUILD_MPI)
-  ADD_DEFINITIONS(-DUSE_MPI)
-  include_directories(${MPI_CXX_INCLUDE_PATH})
+  ##ADD_DEFINITIONS(-DUSE_MPI)
+  target_compile_definitions(PhreeqcRM PRIVATE USE_MPI)
+  ##include_directories(${MPI_CXX_INCLUDE_PATH})
+  target_include_directories(PhreeqcRM PRIVATE ${MPI_CXX_INCLUDE_PATH})
   set(LINK_LIBS ${LINK_LIBS} ${MPI_CXX_LIBRARIES})
   if (PHREEQCRM_FORTRAN_TESTING)
     include_directories(${MPI_Fortran_INCLUDE_PATH})
@@ -287,7 +354,8 @@ if (PHREEQCRM_BUILD_MPI)
 else()
   if (NOT PHREEQCRM_DISABLE_OPENMP)
     if (OPENMP_FOUND)
-      ADD_DEFINITIONS(-DUSE_OPENMP)
+      ##ADD_DEFINITIONS(-DUSE_OPENMP)
+      target_compile_definitions(PhreeqcRM PRIVATE USE_OPENMP)
       set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
       set(CMAKE_C_FLAGS   "${CMAKE_C_FLAGS}   ${OpenMP_C_FLAGS}")
       if (PHREEQCRM_FORTRAN_TESTING)
@@ -299,7 +367,12 @@ endif()
 
 # install
 if (STANDALONE_BUILD EQUAL 1)
-  install(TARGETS PhreeqcRM DESTINATION ${CMAKE_INSTALL_LIBDIR})
+  install(TARGETS PhreeqcRM
+    LIBRARY  DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    ARCHIVE  DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    RUNTIME  DESTINATION ${CMAKE_INSTALL_BINDIR}
+    INCLUDES DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
+    )
   install(FILES ${PhreeqcRM_Headers} DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
   install(FILES ${PhreeqcRM_SRC} DESTINATION src)
 else()
@@ -381,3 +454,9 @@ if (MSVC)
         FORCE)
   endforeach()
 endif()
+
+get_cmake_property(_variableNames VARIABLES)
+list (SORT _variableNames)
+foreach (_variableName ${_variableNames})
+  message(STATUS "${_variableName}=${${_variableName}}")
+endforeach()
