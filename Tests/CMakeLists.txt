@@ -84,18 +84,24 @@ else ()
   if (PHREEQCRM_BUILD_MPI)
     ####SET(EXTRA_LIBS ${EXTRA_LIBS} PhreeqcRM ${MPI_CXX_LIBRARIES})
     ##SET(EXTRA_LIBS ${EXTRA_LIBS} PhreeqcRM)
-    target_link_libraries(TestRM PUBLIC PhreeqcRM)
+    target_link_libraries(TestRM PUBLIC PhreeqcRM::PhreeqcRM)
     target_compile_definitions(TestRM PRIVATE USE_MPI)
     ##target_include_directories(TestRM PUBLIC ${MPI_CXX_INCLUDE_PATH})
     target_link_libraries(TestRM PUBLIC MPI::MPI_CXX)
   else ()
-    SET(EXTRA_LIBS ${EXTRA_LIBS} PhreeqcRM)
+    ##{{
+    ##SET(EXTRA_LIBS ${EXTRA_LIBS} PhreeqcRM)
+    target_link_libraries(TestRM PUBLIC PhreeqcRM::PhreeqcRM)
+    ##}}
   endif ()
 endif ()
 
 # link (zlib must be last on linux)
 if (PHREEQCRM_USE_ZLIB AND ZLIB_FOUND)
-  set(EXTRA_LIBS ${EXTRA_LIBS} ${ZLIB_LIBRARIES})
+  ##{{
+  ##set(EXTRA_LIBS ${EXTRA_LIBS} ${ZLIB_LIBRARIES})
+  target_link_libraries(TestRM PUBLIC ZLIB::ZLIB)
+  ##}}
 endif()
 ##target_link_libraries(TestRM ${EXTRA_LIBS})
 ##target_link_libraries(TestRM PUBLIC ${EXTRA_LIBS})
