@@ -13,6 +13,7 @@
 
 #if defined(_WINDLL) && defined(IPhreeqc_EXPORTS)
 #  define IPQ_DLL_EXPORT __declspec(dllexport)
+#error XXXX
 #else
 #  define IPQ_DLL_EXPORT
 #endif

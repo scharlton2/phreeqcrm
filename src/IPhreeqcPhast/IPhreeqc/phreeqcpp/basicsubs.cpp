@@ -4016,14 +4016,14 @@ basic_free(void)
 
 #if defined(SWIG) || defined(SWIG_IPHREEQC)
 
-#include "BasicCallback.h"
+///#include "BasicCallback.h"
 
 double Phreeqc::
 basic_callback(double x1, double x2, const char * str)
 {
 	if (this->basicCallback)
 	{
-		return this->basicCallback->Callback(x1, x2, str);
+		///return this->basicCallback->Callback(x1, x2, str);
 	}
 	return 0.0;
 }

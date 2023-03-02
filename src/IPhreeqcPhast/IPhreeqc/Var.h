@@ -35,6 +35,17 @@ typedef enum {
 	VR_INVALIDCOL    = -5   /*!< Failure, Invalid column */
 } VRESULT;
 
+#if defined(R_SO) || defined(NO_NAMELESS_UNION) || defined(SWIGPYTHON) || defined(SWIGRUBY)
+/*! \brief Datatype used to store SELECTED_OUTPUT values.
+*/
+typedef struct {
+	VAR_TYPE type;     /*!< holds datatype of <code>VAR</code>          */
+	long     lVal;     /*!< valid when <code>(type == TT_LONG)</code>   */
+	double   dVal;     /*!< valid when <code>(type == TT_DOUBLE)</code> */
+	char*    sVal;     /*!< valid when <code>(type == TT_STRING)</code> */
+	VRESULT  vresult;  /*!< valid when <code>(type == TT_ERROR)</code>  */
+} VAR;
+#else
 /*! \brief Datatype used to store SELECTED_OUTPUT values.
 */
 typedef struct {
@@ -46,7 +57,7 @@ typedef struct {
 		VRESULT vresult;   /*!< valid when <code>(type == TT_ERROR)</code>  */
 	} VAR_UNION_NAME;
 } VAR;
-
+#endif
 
 #if defined(__cplusplus)
 extern "C" {
@@ -88,6 +99,8 @@ IPQ_DLL_EXPORT void    VarInit(VAR* pvar);
 #if defined(__cplusplus)
 }
 #endif
+
+#if !(defined(SWIG) || defined(SWIG_IPHREEQC))
 
 #if defined(__cplusplus)
 
@@ -148,5 +161,7 @@ inline std::ostream& operator<< (std::ostream &os, const VRESULT& vr)
 	return os;
 }
 #endif /* __cplusplus */
+
+#endif /* !(defined(SWIG) || defined(SWIG_IPHREEQC)) */
 
 #endif /* __VAR_H_INC */

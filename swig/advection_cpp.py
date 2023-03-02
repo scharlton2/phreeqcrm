@@ -33,17 +33,17 @@ def units_tester():
 
 
     # Set representative volume
-    rv = phreeqcrm.vectord(nxyz, 1.0)
+    rv = phreeqcrm.DoubleVector(nxyz, 1.0)
     status = phreeqc_rm.SetRepresentativeVolume(rv)
     print(status)
 
     # Set current porosity
-    por = phreeqcrm.vectord(nxyz, 0.2)
+    por = phreeqcrm.DoubleVector(nxyz, 0.2)
     status = phreeqc_rm.SetPorosity(por)
     print(status)
 
     # Set saturation
-    sat = phreeqcrm.vectord(nxyz, 1.0)
+    sat = phreeqcrm.DoubleVector(nxyz, 1.0)
     status = phreeqc_rm.SetSaturation(sat)
     print(status)
 
@@ -78,7 +78,7 @@ def units_tester():
     print(components)
 
     # Set initial conditions
-    cell_numbers = phreeqcrm.vectori()
+    cell_numbers = phreeqcrm.IntVector()
     cell_numbers.push_back(0)
    
     status = phreeqc_rm.InitialPhreeqcCell2Module(1, cell_numbers)
@@ -90,13 +90,13 @@ def units_tester():
     status = phreeqc_rm.InitialPhreeqcCell2Module(3, cell_numbers)
     print(status)
     # Retrieve concentrations
-    c = phreeqcrm.vectord()
+    c = phreeqcrm.DoubleVector()
     status = phreeqc_rm.SetFilePrefix("Units_Worker");
     print(status)
     if (phreeqc_rm.GetMpiMyself() == 0):
         phreeqc_rm.OpenFiles()
 
-    print_mask = phreeqcrm.vectori(3, 1)
+    print_mask = phreeqcrm.IntVector(3, 1)
     phreeqc_rm.SetPrintChemistryMask(print_mask)
     phreeqc_rm.SetPrintChemistryOn(True, True, True)
     status = phreeqc_rm.RunCells()
@@ -104,7 +104,7 @@ def units_tester():
 
     status = phreeqc_rm.GetConcentrations(c)
     print(status)
-    so = phreeqcrm.vectord()
+    so = phreeqcrm.DoubleVector()
     status = phreeqc_rm.GetSelectedOutput(so)
     print(status)
     print("Cell {}".format("TODO"))
