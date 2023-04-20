@@ -185,7 +185,6 @@ set(PhreeqcRM_SOURCES
   find_package(yaml-cpp REQUIRED)
 # endif()
 
-
 add_subdirectory(pybind11)
 
 pybind11_add_module(${PYTHON_TARGET_NAME} main.cpp ${PhreeqcRM_SOURCES})
@@ -215,15 +214,10 @@ target_include_directories(${PYTHON_TARGET_NAME}
 
 enable_testing()
 
-# add_test(NAME python-tests
-#   COMMAND ${PYTHON_EXECUTABLE} -m pytest ${CMAKE_CURRENT_SOURCE_DIR}/tests
-#   WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
-# )
-
 add_test(NAME run_pytest
   COMMAND ${PYTHON_EXECUTABLE} -m pytest
   WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/tests
 )
 
 set_tests_properties(run_pytest
-    PROPERTIES ENVIRONMENT "PYTHONPATH=${CMAKE_CURRENT_BINARY_DIR}:$ENV{PYTHONPATH}")
+    PROPERTIES ENVIRONMENT "PYTHONPATH=$<TARGET_FILE_DIR:${PYTHON_TARGET_NAME}>")
