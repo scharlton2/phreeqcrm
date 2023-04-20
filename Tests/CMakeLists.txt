@@ -172,6 +172,21 @@ add_test(TestBMIdtor TestBMIdtor)
 
 #-----------------------------------------------------------------------------#
 
+# test BMIPhreeqcRM Initialize
+add_executable(TestBMIInitialize)
+
+# TestRM C/CXX source
+target_sources(TestBMIInitialize PRIVATE
+  TestBMIInitialize.cpp
+)
+
+# library dependencies
+target_link_libraries(TestBMIInitialize PhreeqcRM::PhreeqcRM)
+
+add_test(TestBMIInitialize TestBMIInitialize)
+
+#-----------------------------------------------------------------------------#
+
 # test compile and run
 add_test(TestCompileAndRun TestRM)
 

@@ -115,24 +115,30 @@ void BMIPhreeqcRM::Construct(PhreeqcRM::Initializer i)
 // Model control functions.
 void BMIPhreeqcRM::Initialize(std::string config_file)
 {
+	if (config_file.size() != 0)
+	{
 #ifdef USE_YAML
-	YAML::Node yaml = YAML::LoadFile(config_file);
-	std::string keyword;
-	YAML::Node node;
-	if (yaml["SetGridCellCount"].IsDefined())
-	{
-		this->initializer.nxyz_arg = yaml["SetGridCellCount"].as<int>();
-	}
-	if (yaml["ThreadCount"].IsDefined())
-	{
-		this->initializer.data_for_parallel_processing = yaml["ThreadCount"].as<int>();
-	}
+		YAML::Node yaml = YAML::LoadFile(config_file);
+		std::string keyword;
+		YAML::Node node;
+		if (yaml["SetGridCellCount"].IsDefined())
+		{
+			this->initializer.nxyz_arg = yaml["SetGridCellCount"].as<int>();
+		}
+		if (yaml["ThreadCount"].IsDefined())
+		{
+			this->initializer.data_for_parallel_processing = yaml["ThreadCount"].as<int>();
+		}
 #endif
+	}
 
 	this->Construct(this->initializer);
 
 #ifdef USE_YAML
-	this->InitializeYAML(config_file);
+	if (config_file.size() != 0)
+	{
+		this->InitializeYAML(config_file);
+	}
 #endif
 }
 void BMIPhreeqcRM::Update()
