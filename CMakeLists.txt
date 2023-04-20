@@ -46,14 +46,14 @@ if(PHREEQCRM_BUILD_MPI)
   find_package(MPI REQUIRED)
 endif()
 
-option(PHREEQCRM_BUILD_PYTHON "Build python wrapper using SWIG" OFF)
-if (PHREEQCRM_BUILD_PYTHON)
-  find_package(SWIG REQUIRED)
-  # find_package(Python 3.8 REQUIRED COMPONENTS Interpreter Development Development.Module NumPy)
-  # Set Python_ROOT_DIR to specify which python to use
-  # ie -DPython_ROOT_DIR=C:/Python38-x64
-  find_package(Python 3.8 REQUIRED COMPONENTS Interpreter Development)
-endif()
+# option(PHREEQCRM_BUILD_PYTHON "Build python wrapper using SWIG" OFF)
+# if (PHREEQCRM_BUILD_PYTHON)
+#   find_package(SWIG REQUIRED)
+#   # find_package(Python 3.8 REQUIRED COMPONENTS Interpreter Development Development.Module NumPy)
+#   # Set Python_ROOT_DIR to specify which python to use
+#   # ie -DPython_ROOT_DIR=C:/Python38-x64
+#   find_package(Python 3.8 REQUIRED COMPONENTS Interpreter Development)
+# endif()
 
 option(PHREEQCRM_NO_UTF8_ENCODING "Build without utf-8 encoding" OFF)
 
@@ -515,9 +515,9 @@ if(STANDALONE_BUILD EQUAL 1)
   add_subdirectory(Doxygen)
   add_subdirectory(Tests)
 
-  if (PHREEQCRM_BUILD_PYTHON)
-    add_subdirectory(src)
-  endif()
+  # if (PHREEQCRM_BUILD_PYTHON)
+  #   add_subdirectory(src)
+  # endif()
 endif()
 
 # Turn off Incremental Linking for Debug and RelWithDebInfo
