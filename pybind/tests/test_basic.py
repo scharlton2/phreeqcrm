@@ -45,3 +45,10 @@ def test_main():
 
     density_ndarray = np.full((nxyz,), 1.0)
     bmi.set_value("Density", density_ndarray)
+
+    pi = bmi.get_value_test("Pi")
+    assert(pi == 3.14)
+
+    vals = bmi.get_value_test("Test")
+    assert(isinstance(vals, np.ndarray))
+    assert(vals[0] == 3.14)

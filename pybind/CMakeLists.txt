@@ -191,6 +191,9 @@ pybind11_add_module(${PYTHON_TARGET_NAME} main.cpp ${PhreeqcRM_SOURCES})
 ##pybind11_add_module(${PYTHON_TARGET_NAME} main.cpp)
 ##pybind11_add_module(cmake_example main.cpp)
 
+# pybind11 defs
+target_compile_definitions(${PYTHON_TARGET_NAME} PRIVATE WITH_PYBIND11)
+
 # iphreeqc defs
 target_compile_definitions(${PYTHON_TARGET_NAME} PRIVATE SWIG_SHARED_OBJ)
 target_compile_definitions(${PYTHON_TARGET_NAME} PRIVATE USE_PHRQ_ALLOC)

@@ -58,6 +58,23 @@ Args:
 )pbdoc";
 
 
+py::object BMIPhreeqcRM::get_value_test(std::string name)
+{
+    if (name.compare("Pi") == 0)
+    {
+        double output = 3.14;
+        return py::cast(output);
+    }
+    else
+    {
+        std::vector<double> output(20, 3.14);
+        py::array out = py::cast(output);
+        return out;
+    }
+}
+
+
+
 
 PYBIND11_MODULE(phreeqcrm, m) {
 
@@ -134,6 +151,7 @@ PYBIND11_MODULE(phreeqcrm, m) {
     //   virtual void *GetValuePtr(std::string name) = 0;
     //   virtual void GetValueAtIndices(std::string name, void *dest, int *inds, int count) = 0;
 
+    .def("get_value_test", &BMIPhreeqcRM::get_value_test)
 
 
     // Variable setters

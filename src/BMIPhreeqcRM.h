@@ -1,6 +1,12 @@
 #if !defined(BMIPHREEQCRM_H_INCLUDED)
 #define BMIPHREEQCRM_H_INCLUDED
 #include <map>
+
+#if defined(WITH_PYBIND11)
+#include <pybind11/pybind11.h>
+namespace py = pybind11;
+#endif
+
 #include "PhreeqcRM.h"
 #include "BMI_Var.h"
 #include "bmi.hxx"
@@ -1107,6 +1113,12 @@ public:
    // VarFunction GetFn(const std::string name);
    //  std::set<std::string> UpdateMap;
    // std::set<std::string>& GetUpdateMap() { return UpdateMap; }
+
+    //{{
+#if defined(WITH_PYBIND11)
+    py::object get_value_test(std::string arg);
+#endif
+    //}}
 
 protected:
     void Construct(Initializer initializer) override;
