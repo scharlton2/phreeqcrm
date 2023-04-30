@@ -1,6 +1,8 @@
 cmake_minimum_required(VERSION 3.4...3.18)
 
-project(pybindtest)
+project(pybindtest LANGUAGES CXX C)
+
+##set_property(GLOBAL PROPERTY PROJECT_LABEL "pybind11")
 
 set(PYTHON_TARGET_NAME phreeqcrm)
 
@@ -190,6 +192,8 @@ add_subdirectory(pybind11)
 pybind11_add_module(${PYTHON_TARGET_NAME} main.cpp ${PhreeqcRM_SOURCES})
 ##pybind11_add_module(${PYTHON_TARGET_NAME} main.cpp)
 ##pybind11_add_module(cmake_example main.cpp)
+
+##set_target_properties(${PYTHON_TARGET_NAME} PROPERTIES TARGET_NAME "MyCustomTarget")
 
 # pybind11 defs
 target_compile_definitions(${PYTHON_TARGET_NAME} PRIVATE WITH_PYBIND11)

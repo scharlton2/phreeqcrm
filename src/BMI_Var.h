@@ -14,7 +14,7 @@
 #define IRM_DLL_EXPORT
 #endif
 class VarManager;
-class PhreeqcRM;
+//class PhreeqcRM;
 class IRM_DLL_EXPORT BMIVariant
 {
 	//typedef void (VarManager::*VarFunction)(PhreeqcRM* rm_ptr); // function pointer type

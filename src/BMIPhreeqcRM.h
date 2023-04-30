@@ -4,12 +4,22 @@
 
 #if defined(WITH_PYBIND11)
 #include <pybind11/pybind11.h>
+#include <pybind11/numpy.h>
 namespace py = pybind11;
+
+class NotIntialized : public std::runtime_error {
+public:
+    NotIntialized() : std::runtime_error("must call initialize first") { };
+};
+
 #endif
 
 #include "PhreeqcRM.h"
 #include "BMI_Var.h"
 #include "bmi.hxx"
+
+class VarManager;
+
 class NotImplemented : public std::logic_error {
 public:
     NotImplemented() : std::logic_error("Not Implemented") { };
@@ -482,7 +492,7 @@ public:
 
     /**
     @a GetPointableVarNames returns a list of the names of variables
-    for which pointers can be retrieved with @ref GetValuePt.
+    for which pointers can be retrieved with @ref GetValuePtr.
     @retval  A list of the names of variables for which pointers can
     be retieved with @ref GetValuePtr.
 
@@ -1116,7 +1126,13 @@ public:
 
     //{{
 #if defined(WITH_PYBIND11)
-    py::object get_value_test(std::string arg);
+    //py::array get_value_test(std::string arg, py::array dest/* = py::none()*/);
+    //py::array BMIPhreeqcRM::get_value_test(std::string name, py::array_t<double> dest = py::none());
+    py::array get_value_ptr(std::string name);
+
+    void set_value(std::string name, py::array src);
+
+    bool _initialized;   // { var_man != nullptr }
 #endif
     //}}
 

@@ -187,6 +187,38 @@ add_test(TestBMIInitialize TestBMIInitialize)
 
 #-----------------------------------------------------------------------------#
 
+configure_file("output/AdvectBMI_cpp.yaml" "AdvectBMI_cpp.yaml" COPYONLY)
+
+# test BMIPhreeqcRM ComponentCount
+add_executable(TestBMIComponentCount)
+
+# TestRM C/CXX source
+target_sources(TestBMIComponentCount PRIVATE
+  TestBMIComponentCount.cpp
+)
+
+# library dependencies
+target_link_libraries(TestBMIComponentCount PhreeqcRM::PhreeqcRM)
+
+add_test(TestBMIComponentCount TestBMIComponentCount)
+
+#-----------------------------------------------------------------------------#
+
+# test BMIPhreeqcRM SetValue("Porosity", ...)
+add_executable(TestBMISetPorosity)
+
+# TestRM C/CXX source
+target_sources(TestBMISetPorosity PRIVATE
+  TestBMISetPorosity.cpp
+)
+
+# library dependencies
+target_link_libraries(TestBMISetPorosity PhreeqcRM::PhreeqcRM)
+
+add_test(TestBMISetPorosity TestBMISetPorosity)
+
+#-----------------------------------------------------------------------------#
+
 # test compile and run
 add_test(TestCompileAndRun TestRM)
 

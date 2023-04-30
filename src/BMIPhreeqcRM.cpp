@@ -93,12 +93,20 @@ BMIPhreeqcRM::BMIPhreeqcRM()
 , var_man{ nullptr }
 {
 	this->language = "cpp";
+#if defined(WITH_PYBIND11)
+	this->_initialized = false;
+	this->language = "Py";
+#endif
 }
 BMIPhreeqcRM::BMIPhreeqcRM(int nxyz, int nthreads)
 : PhreeqcRM(nxyz, nthreads, nullptr, true) 
 , var_man{ nullptr }
 {
 	this->language = "cpp";
+#if defined(WITH_PYBIND11)
+	this->_initialized = false;
+	this->language = "Py";
+#endif
 }
 // Destructor
 BMIPhreeqcRM::~BMIPhreeqcRM()
@@ -112,6 +120,9 @@ void BMIPhreeqcRM::Construct(PhreeqcRM::Initializer i)
 	BMIPhreeqcRM::Instances.insert(instance);
 	this->var_man = new VarManager((PhreeqcRM*)this);
 	//this->language = "cpp";
+#if defined(WITH_PYBIND11)
+	this->_initialized = true;
+#endif
 }
 
 // Model control functions.
@@ -180,6 +191,11 @@ void BMIPhreeqcRM::UpdateUntil(double time)
 void BMIPhreeqcRM::Finalize()
 {
 	this->CloseFiles();
+#if defined(WITH_PYBIND11)
+	delete this->var_man;
+	this->var_man = nullptr;
+	this->_initialized = false;
+#endif
 }
 int BMIPhreeqcRM::GetInputItemCount()
 {

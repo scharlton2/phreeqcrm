@@ -173,7 +173,7 @@ PhreeqcRM::PhreeqcRM(int nxyz_arg, MP_TYPE data_for_parallel_processing, PHRQ_io
 : phreeqc_bin{ nullptr }
 , phreeqcrm_io{ io }
 , delete_phreeqcrm_io{ false }
-, var_man{ nullptr }
+//, var_man{ nullptr }
 , component_h2o{ true }
 , count_chemistry{ nxyz_arg }
 , mpi_worker_callback_fortran{ nullptr }
@@ -380,7 +380,7 @@ PhreeqcRM::~PhreeqcRM(void)
 			PhreeqcRM::Instances.erase(it);
 		}
 	}
-	delete var_man;
+	//delete var_man;
 	delete this->phreeqc_bin;
 	if (delete_phreeqcrm_io)
 	{
@@ -994,11 +994,15 @@ PhreeqcRM::CloseFiles(void)
 /* ---------------------------------------------------------------------- */
 {
 	this->phreeqcrm_error_string.clear();
-	// open echo and log file, prefix.log.txt
-	this->phreeqcrm_io->log_close();
 
-	// output_file is prefix.chem.txt
-	this->phreeqcrm_io->output_close();
+	if (phreeqcrm_io)
+	{
+		// open echo and log file, prefix.log.txt
+		this->phreeqcrm_io->log_close();
+
+		// output_file is prefix.chem.txt
+		this->phreeqcrm_io->output_close();
+	}
 
 	return IRM_OK;
 }
@@ -1673,6 +1677,12 @@ PhreeqcRM::CreateMapping(std::vector<int> &grid2chem)
 			}
 		}
 #else
+		//{{
+		if (this->nthreads > this->count_chemistry)
+		{
+			this->nthreads = this->count_chemistry;
+		}
+		//}}
 		if (this->nthreads > this->count_chemistry)
 		{
 			std::ostringstream err;
@@ -12790,10 +12800,7 @@ void
 PhreeqcRM::UpdateBMI(RMVARS v_enum)
 /* ---------------------------------------------------------------------- */
 {
-	if (this->var_man != NULL)
-	{
-		this->var_man->RM2BMIUpdate(v_enum);
-	}
+	// no-op
 }
 /* ---------------------------------------------------------------------- */
 void

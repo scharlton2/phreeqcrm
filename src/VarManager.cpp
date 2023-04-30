@@ -1,7 +1,15 @@
 #include "VarManager.h"
 #include "RMVARS.h"
+
+//#if defined(WITH_PYBIND11)
+//#include <pybind11/pybind11.h>
+//#include <pybind11/numpy.h>
+//namespace py = pybind11;
+//#endif
+
 #include <assert.h>
 #include <algorithm>
+#include <sstream>
 VarManager::VarManager(PhreeqcRM* rm_ptr_in) 
 {
 	this->VariantMap[RMVARS::ComponentCount] = 
@@ -177,7 +185,7 @@ void VarManager::ComponentCount_Var()
 		int Nbytes = (int)sizeof(int);
 		//std::string units, set, get, ptr, Nbytes, Itemsize
 		bv.SetBasic("count", false, true, true, Nbytes, Itemsize);
-		bv.SetTypes("int", "integer", "int");
+		bv.SetTypes("int", "integer", "int32");
 		bv.SetIVar(rm_ptr->GetComponentCount());
 		bv.SetInitialized(true);
 	}
@@ -234,7 +242,9 @@ void VarManager::Components_Var()
 		int Nbytes = (int)(size * comps.size());
 		//name, std::string units, set, get, ptr, Nbytes, Itemsize
 		bv.SetBasic("names", false, true, false, Nbytes, Itemsize);
-		bv.SetTypes("std::vector<std::string>", "character(len=:),allocatable,dimension(:)", "");
+		std::ostringstream oss;
+		oss << "<U" << size;
+		bv.SetTypes("std::vector<std::string>", "character(len=:),allocatable,dimension(:)", oss.str());
 		bv.SetStringVector(rm_ptr->GetComponents());
 		bv.SetInitialized(true);
 	}
@@ -303,7 +313,7 @@ void VarManager::Concentrations_Var()
 			break;
 		}
 		bv.SetBasic(units, true, true, true, Nbytes, Itemsize);
-		bv.SetTypes("double", "real(kind=8)", "");
+		bv.SetTypes("double", "real(kind=8)", "float64");
 		rm_ptr->GetConcentrations(bv.GetDoubleVectorRef());
 		rm_ptr->GetConcentrations(this->VarExchange.GetDoubleVectorRef());
 		bv.SetInitialized(true);
@@ -349,7 +359,7 @@ void VarManager::Density_Var()
 		int Nbytes = Itemsize * rm_ptr->GetGridCellCount();
 		//name, std::string units, set, get, ptr, Nbytes, Itemsize  
 		bv.SetBasic("kg L-1", true, true, true, Nbytes, Itemsize);
-		bv.SetTypes("double", "real(kind=8)", "");
+		bv.SetTypes("double", "real(kind=8)", "float64");
 		rm_ptr->GetDensity(this->VarExchange.GetDoubleVectorRef());
 		rm_ptr->GetDensity(bv.GetDoubleVectorRef());
 		bv.SetInitialized(true);
@@ -508,7 +518,7 @@ void VarManager::Gfw_Var()
 		int Nbytes = Itemsize * rm_ptr->GetComponentCount();
 		//name, std::string units, set, get, ptr, Nbytes, Itemsize  
 		bv.SetBasic("g mol-1", false, true, true, Nbytes, Itemsize);
-		bv.SetTypes("double", "real(kind=8)", "");
+		bv.SetTypes("double", "real(kind=8)", "float64");
 		this->VarExchange.GetDoubleVectorRef() = rm_ptr->GetGfw();
 		bv.GetDoubleVectorRef() = rm_ptr->GetGfw();
 		bv.SetInitialized(true);
@@ -552,7 +562,7 @@ void VarManager::GridCellCount_Var()
 		int Nbytes = (int)sizeof(int);
 		//std::string units, set, get, ptr, Nbytes, Itemsize
 		bv.SetBasic("count", false, true, true, Nbytes, Itemsize);
-		bv.SetTypes("int", "integer", "int");
+		bv.SetTypes("int", "integer", "int32");
 		bv.SetIVar(rm_ptr->GetGridCellCount());
 		bv.SetInitialized(true);
 	}
@@ -607,7 +617,7 @@ void VarManager::NthSelectedOutput_Var()
 		int Nbytes = (int)sizeof(int);
 		//std::string units, set, get, ptr, Nbytes, Itemsize
 		bv.SetBasic("id", true, false, false, Nbytes, Itemsize);
-		bv.SetTypes("int", "integer", "int");
+		bv.SetTypes("int", "integer", "int32");
 		bv.SetIVar(-1);
 		bv.SetInitialized(true);
 	}
@@ -652,7 +662,7 @@ void VarManager::Saturation_Var()
 		int Nbytes = Itemsize * rm_ptr->GetGridCellCount();
 		//name, std::string units, set, get, ptr, Nbytes, Itemsize  
 		bv.SetBasic("unitless", true, true, true, Nbytes, Itemsize);
-		bv.SetTypes("double", "real(kind=8)", "");
+		bv.SetTypes("double", "real(kind=8)", "float64");
 		rm_ptr->GetSaturation(this->VarExchange.GetDoubleVectorRef());
 		rm_ptr->GetSaturation(bv.GetDoubleVectorRef());
 		bv.SetInitialized(true);
@@ -722,7 +732,7 @@ void VarManager::SelectedOutput_Var()
 			rm_ptr->GetSelectedOutputColumnCount();
 		//name, std::string units, set, get, ptr, Nbytes, Itemsize  
 		bv.SetBasic("user specified", false, true, false, Nbytes, Itemsize);
-		bv.SetTypes("double", "real(kind=8)", "");
+		bv.SetTypes("double", "real(kind=8)", "float64");
 	}
 	switch (this->task)
 	{
@@ -762,7 +772,7 @@ void VarManager::SelectedOutputColumnCount_Var()
 		int Nbytes = (int)sizeof(int);
 		//std::string units, set, get, ptr, Nbytes, Itemsize
 		bv.SetBasic("count", false, true, false, Nbytes, Itemsize);
-		bv.SetTypes("int", "integer", "int");
+		bv.SetTypes("int", "integer", "int32");
 		bv.SetIVar(rm_ptr->GetSelectedOutputColumnCount());
 		bv.SetInitialized(true);
 	}
@@ -810,7 +820,7 @@ void VarManager::SelectedOutputCount_Var()
 		int Nbytes = (int)sizeof(int);
 		//std::string units, set, get, ptr, Nbytes, Itemsize
 		bv.SetBasic("count", false, true, false, Nbytes, Itemsize);
-		bv.SetTypes("int", "integer", "int");
+		bv.SetTypes("int", "integer", "int32");
 		bv.SetIVar(rm_ptr->GetSelectedOutputCount());
 		bv.SetInitialized(true);
 	}
@@ -866,7 +876,7 @@ void VarManager::SelectedOutputHeadings_Var()
 		int Nbytes = (int)(size * headings.size());
 		//name, std::string units, set, get, ptr, Nbytes, Itemsize
 		bv.SetBasic("names", false, true, false, Nbytes, Itemsize);
-		bv.SetTypes("std::vector<std::string>", "character(len=:),allocatable,dimension(:)", "");
+		bv.SetTypes("std::vector<std::string>", "character(len=:),allocatable,dimension(:)", "std::vector<std::string>");
 		bv.SetInitialized(true);
 	}
 	switch (this->task)
@@ -929,7 +939,7 @@ void VarManager::SelectedOutputRowCount_Var()
 		int Nbytes = (int)sizeof(int);
 		//std::string units, set, get, ptr, Nbytes, Itemsize
 		bv.SetBasic("count", false, true, false, Nbytes, Itemsize);
-		bv.SetTypes("int", "integer", "int");
+		bv.SetTypes("int", "integer", "int32");
 		bv.SetIVar(rm_ptr->GetSelectedOutputRowCount());
 		bv.SetInitialized(true);
 	}
@@ -977,7 +987,7 @@ void VarManager::SolutionVolume_Var()
 		int Nbytes = Itemsize * rm_ptr->GetGridCellCount();
 		//name, std::string units, set, get, ptr, Nbytes, Itemsize  
 		bv.SetBasic("L", false, true, true, Nbytes, Itemsize);
-		bv.SetTypes("double", "real(kind=8)", "");
+		bv.SetTypes("double", "real(kind=8)", "float64");
 		this->VarExchange.GetDoubleVectorRef() = rm_ptr->GetSolutionVolume();
 		bv.GetDoubleVectorRef() = rm_ptr->GetSolutionVolume();
 		bv.SetInitialized(true);
@@ -1022,7 +1032,7 @@ void VarManager::Time_Var()
 		int Nbytes = Itemsize;
 		//name, std::string units, set, get, ptr, Nbytes, Itemsize  
 		bv.SetBasic("s", true, true, true, Nbytes, Itemsize);
-		bv.SetTypes("double", "real(kind=8)", "");
+		bv.SetTypes("double", "real(kind=8)", "float64");
 		this->VarExchange.SetDVar(rm_ptr->GetTime());
 		bv.SetDVar(rm_ptr->GetTime());
 		bv.SetInitialized(true);
@@ -1068,7 +1078,7 @@ void VarManager::TimeStep_Var()
 		int Nbytes = Itemsize;
 		//name, std::string units, set, get, ptr, Nbytes, Itemsize  
 		bv.SetBasic("s", true, true, true, Nbytes, Itemsize);
-		bv.SetTypes("double", "real(kind=8)", "");
+		bv.SetTypes("double", "real(kind=8)", "float64");
 		this->VarExchange.SetDVar(rm_ptr->GetTimeStep());
 		bv.SetDVar(rm_ptr->GetTimeStep());
 		bv.SetInitialized(true);
@@ -1114,7 +1124,7 @@ void VarManager::CurrentSelectedOutputUserNumber_Var()
 		int Nbytes = (int)sizeof(int);
 		//std::string units, set, get, ptr, Nbytes, Itemsize
 		bv.SetBasic("id", false, true, false, Nbytes, Itemsize);
-		bv.SetTypes("int", "integer", "int");
+		bv.SetTypes("int", "integer", "int32");
 		bv.SetIVar(rm_ptr->GetCurrentSelectedOutputUserNumber());
 		bv.SetInitialized(true);
 	}
@@ -1162,7 +1172,7 @@ void VarManager::Porosity_Var()
 		int Nbytes = Itemsize * rm_ptr->GetGridCellCount();
 		//name, std::string units, set, get, ptr, Nbytes, Itemsize  
 		bv.SetBasic("unitless", true, true, true, Nbytes, Itemsize);
-		bv.SetTypes("double", "real(kind=8)", "");
+		bv.SetTypes("double", "real(kind=8)", "float64");
 		this->VarExchange.GetDoubleVectorRef() = rm_ptr->GetPorosity();
 		bv.GetDoubleVectorRef() = rm_ptr->GetPorosity();
 		bv.SetInitialized(true);
@@ -1239,7 +1249,7 @@ void VarManager::Pressure_Var()
 		int Nbytes = Itemsize * rm_ptr->GetGridCellCount();
 		//name, std::string units, set, get, ptr, Nbytes, Itemsize  
 		bv.SetBasic("atm", true, true, true, Nbytes, Itemsize);
-		bv.SetTypes("double", "real(kind=8)", "");
+		bv.SetTypes("double", "real(kind=8)", "float64");
 		this->VarExchange.GetDoubleVectorRef() = rm_ptr->GetPressure();
 		bv.GetDoubleVectorRef() = rm_ptr->GetPressure();
 		bv.SetInitialized(true);
@@ -1285,7 +1295,7 @@ void VarManager::SelectedOutputOn_Var()
 		int Nbytes = (int)sizeof(bool);
 		//std::string units, set, get, ptr, Nbytes, Itemsize
 		bv.SetBasic("bool", true, true, true, Nbytes, Itemsize);
-		bv.SetTypes("bool", "logical", "");
+		bv.SetTypes("bool", "logical", "bool");
 		bv.SetBVar(rm_ptr->GetSelectedOutputOn());
 		bv.SetInitialized(true);
 	}
@@ -1333,7 +1343,7 @@ void VarManager::Temperature_Var()
 		int Nbytes = Itemsize * rm_ptr->GetGridCellCount();
 		//name, std::string units, set, get, ptr, Nbytes, Itemsize  
 		bv.SetBasic("C", true, true, true, Nbytes, Itemsize);
-		bv.SetTypes("double", "real(kind=8)", "");
+		bv.SetTypes("double", "real(kind=8)", "float64");
 		this->VarExchange.GetDoubleVectorRef() = rm_ptr->GetTemperature();
 		bv.GetDoubleVectorRef() = rm_ptr->GetTemperature();
 		bv.SetInitialized(true);
@@ -1379,7 +1389,7 @@ void VarManager::Viscosity_Var()
 		int Nbytes = Itemsize * rm_ptr->GetGridCellCount();
 		//name, std::string units, set, get, ptr, Nbytes, Itemsize  
 		bv.SetBasic("mPa s", false, true, true, Nbytes, Itemsize);
-		bv.SetTypes("double", "real(kind=8)", "");
+		bv.SetTypes("double", "real(kind=8)", "float64");
 		rm_ptr->GetViscosity(this->VarExchange.GetDoubleVectorRef());
 		rm_ptr->GetViscosity(bv.GetDoubleVectorRef());
 		bv.SetInitialized(true);
