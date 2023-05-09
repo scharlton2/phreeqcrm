@@ -6,6 +6,13 @@
 #include <vector>
 #include <cassert>
 #include <cstring>
+
+#if defined(WITH_PYBIND11)
+#include <pybind11/pybind11.h>
+#include <pybind11/numpy.h>
+namespace py = pybind11;
+#endif
+
 //#include "VarManager.h"
 
 #if defined(_WINDLL)
@@ -44,6 +51,10 @@ private:
 	void*							VoidPtr;
 	std::vector<const char*>        CharVector;
 	VarFunction fn;
+#if defined(WITH_PYBIND11)
+	bool hasPyArr;
+	py::array pyArr;
+#endif
 public:
 	// methods
 	BMIVariant(VarFunction f, std::string name);
@@ -62,6 +73,9 @@ public:
 		NotImplemented = false;
 		VoidPtr = NULL;
 		fn = NULL;
+#if defined(WITH_PYBIND11)
+		hasPyArr = false;
+#endif
 	}
 	void Clear();
 	void SetBasic(std::string units_in,
@@ -151,6 +165,25 @@ public:
 	}
 	bool& GetNotImplementedRef() { return this->NotImplemented; }
 	void CopyScalars(BMIVariant& bv);
+
+#if defined(WITH_PYBIND11)
+	bool HasPyArray()
+	{
+		return hasPyArr;
+	}
+	py::array GetPyArray()
+	{
+		assert(hasPyArr);
+		return pyArr;
+	}
+	py::array SetPyArray(py::array arr)
+	{
+		assert(!hasPyArr);
+		pyArr = arr;
+		hasPyArr = true;
+		return pyArr;
+	}
+#endif
 };
 
 class IRM_DLL_EXPORT BMI_Var

@@ -450,6 +450,63 @@ py::array get_value_ptr(std::string name)
 //}
 
 
+//void copy_array(const py::array_t<double>& src, const py::array_t<double>& dst) {
+//    auto src_buf = src.request();  // obtain buffer information for source array
+//    auto dst_buf = dst.request();  // obtain buffer information for destination array
+//    double* src_ptr = static_cast<double*>(src_buf.ptr);  // get pointer to source data
+//    double* dst_ptr = static_cast<double*>(dst.mutable_data());  // get pointer to mutable destination data
+//    std::memcpy(dst_ptr, src_ptr, src_buf.size * sizeof(double));  // copy data from source to destination
+//}
+
+/*
+* Get a copy of values of the given variable
+*/
+py::array BMIPhreeqcRM::get_value(std::string name, py::array dest)
+{
+    if (!this->_initialized) throw NotIntialized();
+
+    assert(this->var_man);
+    RMVARS v_enum = this->var_man->GetEnum(name);
+    if (v_enum == RMVARS::NotFound) throw std::runtime_error("Unknown variable name");
+
+    BMIVariant& bv = this->var_man->VariantMap[v_enum];
+    ///if (!bv.GetHasPtr()) throw std::runtime_error("This variable does not support get_value_ptr.");   // this throws on "ComponentCount"
+
+    assert(this->language == "Py");
+
+    // this call is REQUIRED for the BMIVariant::GetVoidPtr() to be valid
+    this->GetValuePtr(name);
+
+    assert(this->GetVarType(name) == bv.GetPType());
+
+    // dest dtype
+    py::ssize_t dst_ndim = dest.ndim();
+    py::dtype dst_dt = dest.dtype();
+    std::string dst_dt_str = std::string(dst_dt.str());
+
+    // src array
+    auto src = get_value_ptr(name);
+
+    // src dtype
+    py::ssize_t src_ndim = src.ndim();
+    py::dtype src_dt = src.dtype();
+    std::string src_dt_str = std::string(src_dt.str());
+
+    if (dst_dt != src_dt)
+    {
+        throw std::runtime_error("bad array dtype");
+    }
+
+    auto src_buf = src.request();  // obtain buffer information for source array
+    auto dst_buf = dest.request();  // obtain buffer information for destination array
+    void* src_ptr = src_buf.ptr;
+    void* dst_ptr = dest.mutable_data();
+
+    std::memcpy(dst_ptr, src_ptr, src_buf.size * src_buf.itemsize);
+
+    return dest;
+}
+
 py::array BMIPhreeqcRM::get_value_ptr(std::string name)
 {
     if (!this->_initialized) throw NotIntialized();
@@ -459,6 +516,14 @@ py::array BMIPhreeqcRM::get_value_ptr(std::string name)
     if (v_enum == RMVARS::NotFound) throw std::runtime_error("Unknown variable name");
 
     BMIVariant& bv = this->var_man->VariantMap[v_enum];
+
+    //{{
+    if (bv.HasPyArray())
+    {
+        return bv.GetPyArray();
+    }
+    //}}
+
     ///if (!bv.GetHasPtr()) throw std::runtime_error("This variable does not support get_value_ptr.");   // this throws on "ComponentCount"
 
     assert(this->language == "Py");
@@ -521,7 +586,7 @@ py::array BMIPhreeqcRM::get_value_ptr(std::string name)
         py::detail::array_proxy(a.ptr())->flags &= ~py::detail::npy_api::NPY_ARRAY_WRITEABLE_;
         assert(!a.writeable());
     }
-    return a;
+    return bv.SetPyArray(a);
 }
 
 
@@ -550,8 +615,6 @@ void BMIPhreeqcRM::set_value(std::string name, py::array arr)
     const py::ssize_t* shape = arr.shape();
     py::ssize_t sz = arr.size();
 
-    //py::ssize_t arr_dim = shape[0];
-
     // Check dimension
     if (!(ndim > 0 && shape[0] == dim))
     {
@@ -561,7 +624,6 @@ void BMIPhreeqcRM::set_value(std::string name, py::array arr)
         throw std::runtime_error(oss.str());
     }
 
-    assert(dt.itemsize() == bv.GetItemsize());
     if (dt_str == "float64")
     {
         //std::vector<double>& ref = this->var_man->VarExchange.GetDoubleVectorRef();
@@ -578,13 +640,61 @@ void BMIPhreeqcRM::set_value(std::string name, py::array arr)
         assert(bv.GetCType() == "int" && dim > 1);
         this->SetValue(name, (void*)arr.data());
     }
+    else if (dt_str.rfind("<U", 0) == 0)
+    {
+        assert(dt.kind() == 'U');
 
-    //// Store in var_man->VarExchange
-    //this->var_man->VarExchange.GetDoubleVectorRef().resize(bv.GetDim());
-    //this->var_man->VarExchange.SetDoubleVector(src);
-    //// Set the variable
-    //this->var_man->task = VarManager::VAR_TASKS::SetVar;
-    //((*this->var_man).*bv.GetFn())();
+        std::vector<std::string> result;
+        for (auto item : arr)
+        {
+            result.push_back(py::cast<std::string>(item));
+        }
+
+        size_t n = result.size();
+        assert(n > 0);
+        assert(shape[0] == n);
+        assert(ndim == 1);
+        assert(sz == n);
+
+        if (n == 1)
+        {
+            this->SetValue(name, result[0]);
+
+            std::string value;
+            this->GetValue(name, value);
+            assert(value == "prefix");
+        }
+        else
+        {
+            // this should have been caught in check dims above
+            assert(false);
+        }
+    }
+    else if (dt_str == "bool")
+    {
+        std::vector<bool> result;
+        for (auto item : arr)
+        {
+            bool b = py::cast<bool>(item);
+            result.push_back(py::cast<bool>(item));
+        }
+
+        size_t n = result.size();
+        assert(n > 0);
+        assert(shape[0] == n);
+        assert(ndim == 1);
+        assert(sz == n);
+
+        if (n == 1)
+        {
+            this->SetValue(name, result[0]);
+        }
+        else
+        {
+            // this should have been caught in check dims above
+            assert(false);
+        }
+    }
     return;
 }
 
@@ -864,12 +974,27 @@ void my_function(py::array_t<T> input_array) {
 //    m.def("my_function", &my_function<int>, "A function that accepts an array-like variable of ints");
 //}
 
+//void my_func(py::array_t<py::str> arr) {
+void my_func(py::list strings)
+{
+    std::vector<std::string> result;
+    for (auto item : strings)
+    {
+        std::string s = py::cast<std::string>(item);
+        result.push_back(py::cast<std::string>(item));
+    }
+    //return result;
+}
 
 PYBIND11_MODULE(phreeqcrm, m) {
 
     m.def("my_function", &my_function<double>, "A function that accepts an array-like variable of doubles");
     m.def("my_function", &my_function<int>, "A function that accepts an array-like variable of ints");
 
+    m.def("my_func",
+        &my_func,
+        "A function that takes a NumPy array of strings."
+    );
 
     py::class_<BMIPhreeqcRM>(m, "bmi_phreeqcrm" , py::dynamic_attr())
         .def(py::init())
@@ -879,11 +1004,18 @@ PYBIND11_MODULE(phreeqcrm, m) {
         //
 
         // def initialize(self, config_file: str) -> None:
+        //.def("initialize",
+        //    &BMIPhreeqcRM::Initialize,
+        //    initialize_docstring.c_str(),
+        //    py::arg("config_file")
+        //)
+
         .def("initialize",
             &BMIPhreeqcRM::Initialize,
             initialize_docstring.c_str(),
-            py::arg("config_file")
+            py::arg("config_file") = py::str("")
         )
+
 
         // def update(self) -> None:
         .def("update",
@@ -934,6 +1066,15 @@ PYBIND11_MODULE(phreeqcrm, m) {
             get_component_name_docstring.c_str()
         )
 
+
+        // def get_value(self, name: str, dest: np.ndarray) -> np.ndarray:
+        .def("get_value",
+            &BMIPhreeqcRM::get_value,
+            py::arg("name"),
+            py::arg("dest")
+        )
+
+
         // def get_value_ptr(self, name: str) -> np.ndarray:
         .def("get_value_ptr",
             &BMIPhreeqcRM::get_value_ptr,
@@ -969,6 +1110,8 @@ PYBIND11_MODULE(phreeqcrm, m) {
             por = np.full((nxyz,), 0.2)
             bmi.set_value("Porosity", por)
         */
+
+
         .def("set_value",
             &BMIPhreeqcRM::set_value,
             py::arg("var_name"),

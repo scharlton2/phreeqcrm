@@ -58,6 +58,10 @@ VarManager::VarManager(PhreeqcRM* rm_ptr_in)
 		BMIVariant(&VarManager::Time_Var, "Time");
 	this->VariantMap[RMVARS::TimeStep] =
 		BMIVariant(&VarManager::TimeStep_Var, "TimeStep");
+#if defined(WITH_PYBIND11)
+	this->VariantMap[RMVARS::UseSolutionDensityVolume] =
+		BMIVariant(&VarManager::UseSolutionDensityVolume_Var, "UseSolutionDensityVolume");
+#endif
 	this->VariantMap[RMVARS::Viscosity] =
 		BMIVariant(&VarManager::Viscosity_Var, "Viscosity");
 	///!!!VarFunction x = &VarManager::ComponentCount_var;
@@ -1113,6 +1117,49 @@ void VarManager::TimeStep_Var()
 	this->VarExchange.CopyScalars(bv);
 	this->SetCurrentVar(RMVARS::NotFound);
 }
+#if defined(WITH_PYBIND11)
+void VarManager::UseSolutionDensityVolume_Var()
+{
+	RMVARS VARS_myself = RMVARS::UseSolutionDensityVolume;
+	this->SetCurrentVar(VARS_myself);
+	BMIVariant& bv = this->VariantMap[VARS_myself];
+	if (!bv.GetInitialized())
+	{
+		int Itemsize = sizeof(bool);
+		int Nbytes = Itemsize;
+		//name, std::string units, set, get, ptr, Nbytes, Itemsize
+		bv.SetBasic("t/f", true, true, true, Nbytes, Itemsize);
+		bv.SetTypes("bool", "logical", "bool");
+		///this->VarExchange.SetDVar(rm_ptr->GetTimeStep());
+		///bv.SetDVar(rm_ptr->GetTimeStep());
+		bv.SetInitialized(true);
+	}
+	switch (this->task)
+	{
+	case VarManager::VAR_TASKS::GetPtr:
+	{
+		assert(false);
+		break;
+	}
+	case VarManager::VAR_TASKS::GetVar:
+	case VarManager::VAR_TASKS::Update:
+	case VarManager::VAR_TASKS::RMUpdate:
+	{
+		assert(false);
+		break;
+	}
+	case VarManager::VAR_TASKS::SetVar:
+		rm_ptr->UseSolutionDensityVolume(*this->VarExchange.GetBVarPtr());
+		bv.SetBVar(*this->VarExchange.GetBVarPtr());
+		break;
+	case VarManager::VAR_TASKS::no_op:
+	case VarManager::VAR_TASKS::Info:
+		break;
+	}
+	this->VarExchange.CopyScalars(bv);
+	this->SetCurrentVar(RMVARS::NotFound);
+}
+#endif
 void VarManager::CurrentSelectedOutputUserNumber_Var()
 {
 	RMVARS VARS_myself = RMVARS::CurrentSelectedOutputUserNumber;

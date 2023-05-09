@@ -109,6 +109,9 @@ public:
 	void SolutionVolume_Var();
 	void Time_Var();
 	void TimeStep_Var();
+#if defined(WITH_PYBIND11)
+	void UseSolutionDensityVolume_Var();
+#endif
 	void CurrentSelectedOutputUserNumber_Var();
 	void Porosity_Var();
 	void Pressure_Var();

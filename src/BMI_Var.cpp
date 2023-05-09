@@ -15,6 +15,9 @@ BMIVariant::BMIVariant(VarFunction f, std::string name_in)
 	NotImplemented = false;
 	VoidPtr = NULL;
 	fn = f;
+#if defined(WITH_PYBIND11)
+	hasPyArr = false;
+#endif
 }
 void BMIVariant::CopyScalars(BMIVariant& bv)
 {

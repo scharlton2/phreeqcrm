@@ -27,6 +27,9 @@ enum class RMVARS {
 	SelectedOutputOn,
 	Temperature,
 	Viscosity,
+#if defined(WITH_PYBIND11)
+	UseSolutionDensityVolume,
+#endif
 	NotFound
 };
 #endif

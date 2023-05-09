@@ -1,6 +1,7 @@
 import os
 import phreeqcrm as rm
 import numpy as np
+from numpy.testing import assert_array_almost_equal, assert_array_less
 import pytest
 
 def test_main():
@@ -106,10 +107,6 @@ def test_main():
     assert(temperature[nxyz - 1] == pytest.approx(20.))
 
 
-    # test set value as list
-    temp_list = [19.8] * nxyz
-    bmi.set_value("Temperature", temp_list)
-
     ##}}
 
 
@@ -185,8 +182,6 @@ def test_main():
     # density_ndarray = np.full((nxyz,), 1.0)
     # bmi.set_value("Density", density_ndarray)
 
-    bmi.finalize()
-    assert(not bmi._initialized)
 
 
     '''
@@ -237,3 +232,76 @@ def test_main():
     bmi.set_value("Porosity", por)
 
     '''
+
+    # Set properties
+    # c_h2o = np.full((1,), False)
+    # bmi.set_value("ComponentH2O", c_h2o)                    # YAML "SetComponentH2O"
+
+    # use_sol_dens_vol = np.full((1,), False)
+    # bmi.set_value("UseSolutionDensityVolume", use_sol_dens_vol)        # YAML "UseSolutionDensityVolume"
+
+    file_prefix = np.full((1,), "prefix")
+    bmi.set_value("FilePrefix", file_prefix)
+
+    # file_prefix = np.full((nxyz,), "nxyz_prefix")
+    # with pytest.raises(RuntimeError, match="dimension error in set_value: FilePrefix"):
+    #     bmi.set_value("FilePrefix", file_prefix)
+
+    use_sol_dens_vol = np.full((1,), False)
+    bmi.set_value("UseSolutionDensityVolume", use_sol_dens_vol)        # YAML "UseSolutionDensityVolume"
+
+
+    bmi.finalize()
+    assert(not bmi._initialized)
+
+
+def test_get_value_copy():
+
+    model = rm.bmi_phreeqcrm()
+    model.initialize()
+
+    dest0 = np.empty(model.get_grid_size(0), dtype=float)
+    dest1 = np.empty(model.get_grid_size(0), dtype=float)
+
+    z0 = model.get_value("Porosity", dest0)
+    z1 = model.get_value("Porosity", dest1)
+
+    assert z0 is not z1
+    assert_array_almost_equal(z0, z1)
+
+
+def test_get_value_pointer():
+    model = rm.bmi_phreeqcrm()
+    model.initialize()
+
+    dest1 = np.empty(model.get_grid_size(0), dtype=float)
+
+    z0 = model.get_value_ptr("Porosity")
+    z1 = model.get_value("Porosity", dest1)
+
+    assert z0 is not z1
+    assert_array_almost_equal(z0.flatten(), z1)
+
+#     # This will throw:
+#     # Solutions not defined for these cells:
+#     # Chem cell 0 = Grid cell(s): 0
+#     # Chem cell 1 = Grid cell(s): 1
+#     # Chem cell 2 = Grid cell(s): 2
+#     # Chem cell 3 = Grid cell(s): 3
+#     # Chem cell 4 = Grid cell(s): 4
+#     # for _ in range(10):
+#     #     model.update()
+
+    assert z0 is model.get_value_ptr("Porosity")
+
+
+# def test_get_value_at_indices():
+#     model = rm.bmi_phreeqcrm()
+#     model.initialize()
+
+#     dest = np.empty(3, dtype=float)
+
+#     z0 = model.get_value_ptr("plate_surface__temperature")
+#     z1 = model.get_value_at_indices("plate_surface__temperature", dest, [0, 2, 4])
+
+#     assert_array_almost_equal(z0.take((0, 2, 4)), z1)

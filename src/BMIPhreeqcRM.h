@@ -5,6 +5,9 @@
 #if defined(WITH_PYBIND11)
 #include <pybind11/pybind11.h>
 #include <pybind11/numpy.h>
+#include <pybind11/stl.h>
+#include <pybind11/stl_bind.h>
+
 namespace py = pybind11;
 
 class NotIntialized : public std::runtime_error {
@@ -1126,6 +1129,9 @@ public:
 
     //{{
 #if defined(WITH_PYBIND11)
+
+    py::array BMIPhreeqcRM::get_value(std::string name, py::array arr);
+
     //py::array get_value_test(std::string arg, py::array dest/* = py::none()*/);
     //py::array BMIPhreeqcRM::get_value_test(std::string name, py::array_t<double> dest = py::none());
     py::array get_value_ptr(std::string name);
