@@ -778,6 +778,10 @@
         "PHREEQCRM_BUILD_PYTHON": {
           "type": "BOOL",
           "value": "ON"
+        },
+        "Python_ROOT_DIR": {
+          "type": "PATH",
+          "value": "C:/Python38-x64"
         }
       }
     },

@@ -272,7 +272,8 @@ def test_get_value_copy():
 
 def test_get_value_pointer():
     model = rm.bmi_phreeqcrm()
-    model.initialize()
+    #model.initialize()
+    model.initialize("AdvectBMI_py.yaml")
 
     dest1 = np.empty(model.get_grid_size(0), dtype=float)
 
@@ -282,16 +283,9 @@ def test_get_value_pointer():
     assert z0 is not z1
     assert_array_almost_equal(z0.flatten(), z1)
 
-#     # This will throw:
-#     # Solutions not defined for these cells:
-#     # Chem cell 0 = Grid cell(s): 0
-#     # Chem cell 1 = Grid cell(s): 1
-#     # Chem cell 2 = Grid cell(s): 2
-#     # Chem cell 3 = Grid cell(s): 3
-#     # Chem cell 4 = Grid cell(s): 4
-#     # for _ in range(10):
-#     #     model.update()
-
+    # this will throw if solutions aren't set for each cell (ie in initialize())
+    for _ in range(10):
+        model.update()
     assert z0 is model.get_value_ptr("Porosity")
 
 
