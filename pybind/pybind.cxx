@@ -85,8 +85,8 @@ py::array BMIPhreeqcRM::get_value(std::string name, py::array dest)
             strings.push_back(bv.GetStringVar());
             py::array src = py::cast(strings);
 
-            ssize_t nsrc = src.request().itemsize;
-            ssize_t ndst = dest.request().itemsize;
+            py::ssize_t nsrc = src.request().itemsize;
+            py::ssize_t ndst = dest.request().itemsize;
 
             if (src.request().itemsize > dest.request().itemsize)
             {
