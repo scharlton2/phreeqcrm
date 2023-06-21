@@ -1222,11 +1222,11 @@ public:
     bool _initialized;   // { var_man != nullptr }
 #endif
 
-//#if defined(phreeqcrmpy_EXPORTS)
+#if defined(phreeqcrmpy_EXPORTS)
     void get_value_ptr_double(std::string var, double** vec, int* n);
     void get_value_ptr_int(std::string var, int** vec, int* n);
-    std::vector<std::string>& BMIPhreeqcRM::get_value_ptr_vector_strings(std::string var);
-//#endif
+    std::vector<std::string>& get_value_ptr_vector_strings(std::string var);
+#endif
 
 protected:
     void Construct(Initializer initializer) override;

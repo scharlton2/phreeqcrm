@@ -216,7 +216,6 @@ else()
     # Pytest
     add_test(NAME run_pytest
       COMMAND ${Python_EXECUTABLE} -m pytest
-      CONFIGURATIONS Release RelWithDebInfo MinSizeRel
     )
     set_tests_properties(run_pytest
       PROPERTIES ENVIRONMENT "PYTHONPATH=$<TARGET_FILE_DIR:${PYTHON_TARGET_NAME}>"
