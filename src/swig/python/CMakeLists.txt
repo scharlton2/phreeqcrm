@@ -28,6 +28,9 @@ configure_file(AdvectBMI_py.py AdvectBMI_py.py COPYONLY)
 configure_file(WriteYAMLFile_py.py WriteYAMLFile_py.py COPYONLY)
 configure_file(TestAllMethods_py.py TestAllMethods_py.py COPYONLY)
 
+# copy test_get_value.py (PyTest) to build directory for testing
+configure_file(test_get_value.py test_get_value.py COPYONLY)
+
 get_target_property(PhreeqcRM_SOURCES PhreeqcRM SOURCES)
 
 set(CMAKE_SWIG_FLAGS "-Wall" )
@@ -142,6 +145,15 @@ if(IS_MULTI_CONFIG)
       DEPENDS "WriteYAMLFile_py.py"
       DISABLED $<$<NOT:$<BOOL:${PHREEQCRM_WITH_YAML_CPP}>>:TRUE>
   )
+
+  # Pytest
+  add_test(NAME run_pytest
+    COMMAND ${Python_EXECUTABLE} -m pytest
+    CONFIGURATIONS Release RelWithDebInfo MinSizeRel
+  )
+  set_tests_properties(run_pytest
+    PROPERTIES ENVIRONMENT "PYTHONPATH=$<TARGET_FILE_DIR:${PYTHON_TARGET_NAME}>"
+  )
 else()
   if(WIN32)
     if(NOT "${CMAKE_BUILD_TYPE}" MATCHES "^([Dd][Ee][Bb][Uu][Gg])$")
@@ -167,6 +179,15 @@ else()
           DEPENDS "WriteYAMLFile_py.py"
           DISABLED $<$<NOT:$<BOOL:${PHREEQCRM_WITH_YAML_CPP}>>:TRUE>
       )
+
+      # Pytest
+      add_test(NAME run_pytest
+        COMMAND ${Python_EXECUTABLE} -m pytest
+        CONFIGURATIONS Release RelWithDebInfo MinSizeRel
+      )
+      set_tests_properties(run_pytest
+        PROPERTIES ENVIRONMENT "PYTHONPATH=$<TARGET_FILE_DIR:${PYTHON_TARGET_NAME}>"
+      )
     endif()
   else()
     # SimpleAdvect.py test
@@ -190,6 +211,15 @@ else()
         ENVIRONMENT "PYTHONPATH=$<TARGET_FILE_DIR:${PYTHON_TARGET_NAME}>"
         DEPENDS "WriteYAMLFile_py.py"
         DISABLED $<$<NOT:$<BOOL:${PHREEQCRM_WITH_YAML_CPP}>>:TRUE>
+    )
+
+    # Pytest
+    add_test(NAME run_pytest
+      COMMAND ${Python_EXECUTABLE} -m pytest
+      CONFIGURATIONS Release RelWithDebInfo MinSizeRel
+    )
+    set_tests_properties(run_pytest
+      PROPERTIES ENVIRONMENT "PYTHONPATH=$<TARGET_FILE_DIR:${PYTHON_TARGET_NAME}>"
     )
   endif()
 endif()
