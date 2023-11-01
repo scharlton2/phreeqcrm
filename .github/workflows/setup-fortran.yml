@@ -11,6 +11,7 @@ env:
 
 jobs:
   test:
+    if: ${{ false }}
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
@@ -144,26 +145,27 @@ jobs:
       #############################################################################################################
 
   mpi:
-    if: ${{ false }}
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-22.04, macos-12, windows-2019, windows-2022]
+        # os: [ubuntu-22.04, macos-12, windows-2019, windows-2022]
+        os: [windows-2019, windows-2022]
         toolchain:
-          - {compiler: gcc, version: 9}
-          - {compiler: gcc, version: 13}
+          # - {compiler: gcc, version: 9}
+          # - {compiler: gcc, version: 13}
           # - {compiler: intel, version: '2023.2'}
           - {compiler: intel-classic, version: '2021.10'}
         build_shared_libs: [ON]
         build_type: [Release]
-        mpi: ['mpich', 'ompi', 'impi', 'msmpi']  # see https://github.com/mpi4py/setup-mpi/blob/master/setup-mpi.sh
+        # mpi: ['mpich', 'ompi', 'impi', 'msmpi']  # see https://github.com/mpi4py/setup-mpi/blob/master/setup-mpi.sh
+        mpi: ['impi']  # see https://github.com/mpi4py/setup-mpi/blob/master/setup-mpi.sh
         phreeqcrm_build_mpi: [ON]
         phreeqcrm_fortran_testing: [OFF]
         phreeqcrm_with_yaml_cpp: [OFF]
         include:
-          - os: macos-12
-            toolchain: {compiler: gcc, version: 10}
+          # - os: macos-12
+          #   toolchain: {compiler: gcc, version: 10}
         exclude:
           - os: macos-12
             toolchain: {compiler: intel}
