@@ -169,7 +169,7 @@ jobs:
         # mpi: ['mpich', 'ompi', 'impi', 'msmpi']  # see https://github.com/mpi4py/setup-mpi/blob/master/setup-mpi.sh
         mpi: ['impi']  # see https://github.com/mpi4py/setup-mpi/blob/master/setup-mpi.sh
         phreeqcrm_build_mpi: [ON]
-        phreeqcrm_fortran_testing: [OFF]
+        phreeqcrm_fortran_testing: [ON]
         phreeqcrm_with_yaml_cpp: [OFF]
         # include:
         #   - os: macos-12
