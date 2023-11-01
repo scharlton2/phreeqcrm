@@ -22,6 +22,8 @@ if(PHREEQCRM_FORTRAN_TESTING)
   # TestRM Fortran library
   add_library(FortranAdvect STATIC)
 
+  set_property(TARGET FortranAdvect PROPERTY POSITION_INDEPENDENT_CODE TRUE)
+
   # TestRM Fortran source
   target_sources(FortranAdvect PRIVATE
     Advect_f90.F90
@@ -85,6 +87,7 @@ if(PHREEQCRM_FORTRAN_TESTING)
       source_group("Source Files" FILES "../src/YAML_interface.F90")
     endif()
   endif()
+
 
 
   # The next line sets defines/includes/libraries
