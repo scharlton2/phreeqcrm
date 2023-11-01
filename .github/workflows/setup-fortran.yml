@@ -195,6 +195,12 @@ jobs:
             mpi: 'msmpi'
           - os: ubuntu-22.04
             mpi: 'msmpi'
+          - os: ubuntu-22.04
+            toolchain: {compiler: intel}
+            mpi: 'mpich'
+          - os: ubuntu-22.04
+            toolchain: {compiler: intel}
+            mpi: 'ompi'
           - os: ubuntu-22.04        
             toolchain: {compiler: gcc, version: 9}  # gcc too old for mpich?
             mpi: 'mpich'
