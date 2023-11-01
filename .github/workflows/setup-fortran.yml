@@ -192,16 +192,16 @@ jobs:
             mpi: 'ompi'
 
     steps:
+      - name: Setup mpi
+        uses: mpi4py/setup-mpi@v1
+        with:
+          mpi: ${{ matrix.mpi }}
+
       - uses: fortran-lang/setup-fortran@v1.3
         id: setup-fortran
         with:
           compiler: ${{ matrix.toolchain.compiler }}
           version: ${{ matrix.toolchain.version }}
-
-      - name: Setup mpi
-        uses: mpi4py/setup-mpi@v1
-        with:
-          mpi: ${{ matrix.mpi }}
 
       - name: Show mpi compilers
         run: |
