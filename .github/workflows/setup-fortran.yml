@@ -11,7 +11,6 @@ env:
 
 jobs:
   test:
-    if: ${{ false }}
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
@@ -34,9 +33,13 @@ jobs:
         build_type: [Release]        
         phreeqcrm_fortran_testing: [OFF]
         phreeqcrm_with_yaml_cpp: [OFF]
-        # include:
+        include:
         #   - os: macos-12
         #     toolchain: {compiler: gcc, version: 10}
+          - os: macos-12
+            toolchain: {compiler: gcc, version: 12}
+          - os: ubuntu-22.04
+            toolchain: {compiler: gcc, version: 11}
         exclude:
           - os: macos-12
             toolchain: {compiler: intel}
@@ -140,6 +143,8 @@ jobs:
 
       - run: ctest --output-on-failure --test-dir build
 
+      - run: cat ${{ github.workspace }}/build/Testing/Temporary/LastTest.log
+
       - run: cat build/phreeqcrm.pc
 
       #############################################################################################################
@@ -152,7 +157,7 @@ jobs:
         # os: [ubuntu-22.04, macos-12, windows-2019, windows-2022]
         os: [ubuntu-22.04]
         toolchain:
-          - {compiler: gcc, version: 9}
+          # - {compiler: gcc, version: 9}
           - {compiler: gcc, version: 13}
           - {compiler: intel, version: '2022.1'}
           - {compiler: intel, version: '2022.2'}
@@ -190,6 +195,9 @@ jobs:
             mpi: 'msmpi'
           - os: ubuntu-22.04
             mpi: 'msmpi'
+          - os: ubuntu-22.04        
+            toolchain: {compiler: gcc, version: 9}  # gcc too old for mpich?
+            mpi: 'mpich'
           - os: windows-2019
             mpi: 'mpich'            
           - os: windows-2019
@@ -281,5 +289,7 @@ jobs:
       - run: cmake --build ${{ github.workspace }}/build-mpi
 
       - run: ctest --output-on-failure --test-dir ${{ github.workspace }}/build-mpi
+
+      - run: cat ${{ github.workspace }}/build-mpi/Testing/Temporary/LastTest.log
 
       - run: cat ${{ github.workspace }}/build-mpi/phreeqcrm.pc
