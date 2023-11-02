@@ -498,6 +498,40 @@
       }
     },
     {
+      "name": "vs2019-intel",
+      "condition": {
+        "type": "equals",
+        "lhs": "${hostSystemName}",
+        "rhs": "Windows"
+      },  
+      "displayName": "vs2019-intel",
+      "description": "Intel(R) oneAPI DPC++/C++ Compiler",
+      "generator": "Visual Studio 16 2019",
+      "toolset": "Intel C++ Compiler 2023",
+      "binaryDir": "${sourceDir}/build/${presetName}",
+      "cacheVariables": {
+      },
+      "environment": {
+      }
+    },
+    {
+      "name": "vs2019-intel-classic",
+      "condition": {
+        "type": "equals",
+        "lhs": "${hostSystemName}",
+        "rhs": "Windows"
+      },  
+      "displayName": "vs2019-intel-classic",
+      "description": "Intel(R) C++ Compiler Classic",
+      "generator": "Visual Studio 16 2019",
+      "toolset": "Intel C++ Compiler 19.2",
+      "binaryDir": "${sourceDir}/build/${presetName}",
+      "cacheVariables": {
+      },
+      "environment": {
+      }
+    },
+    {
       "name": "vs2019-static",
       "inherits": "vs2019",
       "cacheVariables": {
