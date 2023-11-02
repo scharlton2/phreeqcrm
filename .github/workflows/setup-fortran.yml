@@ -223,6 +223,7 @@ jobs:
         uses: mpi4py/setup-mpi@v1
         with:
           mpi: ${{ matrix.mpi }}
+        if: runner.os == 'Linux'
 
       - uses: fortran-lang/setup-fortran@v1.3
         id: setup-fortran
@@ -230,12 +231,18 @@ jobs:
           compiler: ${{ matrix.toolchain.compiler }}
           version: ${{ matrix.toolchain.version }}
 
+      - name: Setup mpi
+        uses: mpi4py/setup-mpi@v1
+        with:
+          mpi: ${{ matrix.mpi }}
+        if: runner.os != 'Linux'
+
       - name: Show mpi compilers
         run: |
           mpicc -show
           mpicxx -show
           mpif90 -show
-        if: ${{ matrix.mpi != 'msmpi' }}  
+        if: ${{ matrix.mpi != 'msmpi' }}
 
       - name: Override CC/CXX compilers
         run: |
