@@ -15,7 +15,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-22.04, macos-12, windows-2019, windows-2022]
+        # os: [ubuntu-22.04, macos-12, windows-2019, windows-2022]
+        os: [windows-2019, windows-2022]
         toolchain:
           # - {compiler: gcc, version: 9}
           - {compiler: gcc, version: 11}          # default gnu on ubuntu-22.04
@@ -144,6 +145,18 @@ jobs:
         if: runner.os == 'Windows'
 
       - run: dir $env:ONEAPI_ROOT/compiler
+        if: runner.os == 'Windows'
+
+      - run: dumpbin /imports ${{ github.workspace }}/build/Tests/TestRM.exe | Select-String dll
+        if: runner.os == 'Windows'
+
+      - run: Get-Command -All -ErrorAction Ignore libiomp5md.dll
+        if: runner.os == 'Windows'
+
+      - run: Get-Command -All -ErrorAction Ignore libmmd.dll
+        if: runner.os == 'Windows'
+
+      - run: Get-Command -All -ErrorAction Ignore libifcoremd.dll
         if: runner.os == 'Windows'
 
       - run: ctest --output-on-failure --test-dir build
