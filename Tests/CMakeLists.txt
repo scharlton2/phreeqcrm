@@ -281,10 +281,10 @@ if(DEFINED ENV{ONEAPI_ROOT})
   if(WIN32 AND (${CMAKE_Fortran_COMPILER_ID} MATCHES "Intel") OR (${CMAKE_CXX_COMPILER_ID} MATCHES "Intel"))
     if(CMAKE_SIZEOF_VOID_P EQUAL 8)
       # 64 bits
-      set_tests_properties(TestRM PROPERTIES ENVIRONMENT "PATH=$ENV{ONEAPI_ROOT}\\compiler\\latest\\windows\\redist\\intel64_win\\compiler;$ENV{PATH}")
+      set_tests_properties(TestRM PROPERTIES ENVIRONMENT "PATH=$ENV{ONEAPI_ROOT}\\compiler\\2023.2.0\\windows\\redist\\intel64_win\\compiler;$ENV{PATH}")
     elseif(CMAKE_SIZEOF_VOID_P EQUAL 4)
       # 32 bits
-      set_tests_properties(TestRM PROPERTIES ENVIRONMENT "PATH=$ENV{ONEAPI_ROOT}\\compiler\\latest\\windows\\redist\\ia32_win\\compiler;$ENV{PATH}")
+      set_tests_properties(TestRM PROPERTIES ENVIRONMENT "PATH=$ENV{ONEAPI_ROOT}\\compiler\\2023.2.0\\windows\\redist\\ia32_win\\compiler;$ENV{PATH}")
     endif()
   endif()
 endif()
