@@ -150,13 +150,13 @@ jobs:
       - run: dumpbin /imports ${{ github.workspace }}/build/Tests/TestRM.exe | Select-String dll
         if: runner.os == 'Windows'
 
-      - run: Get-Command -All -ErrorAction Ignore libiomp5md.dll
+      - run: Get-Command -All -ErrorAction Ignore libiomp5md.dll | Select-Object -ExpandProperty Source
         if: runner.os == 'Windows'
 
-      - run: Get-Command -All -ErrorAction Ignore libmmd.dll
+      - run: Get-Command -All -ErrorAction Ignore libmmd.dll | Select-Object -ExpandProperty Source
         if: runner.os == 'Windows'
 
-      - run: Get-Command -All -ErrorAction Ignore libifcoremd.dll
+      - run: Get-Command -All -ErrorAction Ignore libifcoremd.dll | Select-Object -ExpandProperty Source
         if: runner.os == 'Windows'
 
       - run: ctest --output-on-failure --test-dir build

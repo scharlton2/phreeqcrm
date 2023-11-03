@@ -273,21 +273,21 @@ if(MSVC AND BUILD_SHARED_LIBS)
   )
 endif()
 
-# # Add intel runtime path for testing TestRM
-# #
-# ## message(STATUS "CMAKE_Fortran_COMPILER_ID=${CMAKE_Fortran_COMPILER_ID}")
-# ## message(STATUS "CMAKE_CXX_COMPILER_ID=${CMAKE_CXX_COMPILER_ID}")
-# if(DEFINED ENV{ONEAPI_ROOT})
-#   if(WIN32 AND (${CMAKE_Fortran_COMPILER_ID} MATCHES "Intel") OR (${CMAKE_CXX_COMPILER_ID} MATCHES "Intel"))
-#     if(CMAKE_SIZEOF_VOID_P EQUAL 8)
-#       # 64 bits
-#       set_tests_properties(TestRM PROPERTIES ENVIRONMENT "PATH=$ENV{ONEAPI_ROOT}\\compiler\\latest\\windows\\redist\\intel64_win\\compiler;$ENV{PATH}")
-#     elseif(CMAKE_SIZEOF_VOID_P EQUAL 4)
-#       # 32 bits
-#       set_tests_properties(TestRM PROPERTIES ENVIRONMENT "PATH=$ENV{ONEAPI_ROOT}\\compiler\\latest\\windows\\redist\\ia32_win\\compiler;$ENV{PATH}")
-#     endif()
-#   endif()
-# endif()
+# Add intel runtime path for testing TestRM
+#
+## message(STATUS "CMAKE_Fortran_COMPILER_ID=${CMAKE_Fortran_COMPILER_ID}")
+## message(STATUS "CMAKE_CXX_COMPILER_ID=${CMAKE_CXX_COMPILER_ID}")
+if(DEFINED ENV{ONEAPI_ROOT})
+  if(WIN32 AND (${CMAKE_Fortran_COMPILER_ID} MATCHES "Intel") OR (${CMAKE_CXX_COMPILER_ID} MATCHES "Intel"))
+    if(CMAKE_SIZEOF_VOID_P EQUAL 8)
+      # 64 bits
+      set_tests_properties(TestRM PROPERTIES ENVIRONMENT "PATH=$ENV{ONEAPI_ROOT}\\compiler\\latest\\windows\\redist\\intel64_win\\compiler;$ENV{PATH}")
+    elseif(CMAKE_SIZEOF_VOID_P EQUAL 4)
+      # 32 bits
+      set_tests_properties(TestRM PROPERTIES ENVIRONMENT "PATH=$ENV{ONEAPI_ROOT}\\compiler\\latest\\windows\\redist\\ia32_win\\compiler;$ENV{PATH}")
+    endif()
+  endif()
+endif()
 
 if(MSVC AND PHREEQCRM_WITH_YAML_CPP)
   if(TARGET yaml-cpp::yaml-cpp)
