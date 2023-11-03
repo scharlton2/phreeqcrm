@@ -15,8 +15,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        # os: [ubuntu-22.04, macos-12, windows-2019, windows-2022]
-        os: [windows-2019, windows-2022]
+        os: [ubuntu-22.04, macos-12, windows-2019, windows-2022]
         toolchain:
           # - {compiler: gcc, version: 9}
           - {compiler: gcc, version: 11}          # default gnu on ubuntu-22.04
@@ -170,7 +169,6 @@ jobs:
       #############################################################################################################
 
   mpi:
-    if: ${{ false }}
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
@@ -244,7 +242,7 @@ jobs:
         uses: mpi4py/setup-mpi@v1
         with:
           mpi: ${{ matrix.mpi }}
-        if: runner.os == 'Linux'
+        # if: runner.os == 'Linux'
 
       - uses: fortran-lang/setup-fortran@v1.3
         id: setup-fortran
@@ -252,11 +250,11 @@ jobs:
           compiler: ${{ matrix.toolchain.compiler }}
           version: ${{ matrix.toolchain.version }}
 
-      - name: Setup mpi
-        uses: mpi4py/setup-mpi@v1
-        with:
-          mpi: ${{ matrix.mpi }}
-        if: runner.os != 'Linux'
+      # - name: Setup mpi
+      #   uses: mpi4py/setup-mpi@v1
+      #   with:
+      #     mpi: ${{ matrix.mpi }}
+      #   if: runner.os != 'Linux'
 
       - name: Show mpi compilers
         run: |
