@@ -244,7 +244,19 @@ jobs:
         uses: mpi4py/setup-mpi@v1
         with:
           mpi: ${{ matrix.mpi }}
-        # if: runner.os == 'Linux'
+        if: runner.os == 'Linux'
+
+      - uses: fortran-lang/setup-fortran@v1.3
+        id: setup-fortran
+        with:
+          compiler: ${{ matrix.toolchain.compiler }}
+          version: ${{ matrix.toolchain.version }}
+
+      - name: Setup mpi
+        uses: mpi4py/setup-mpi@v1
+        with:
+          mpi: ${{ matrix.mpi }}
+        if: runner.os != 'Linux'
 
       - name: Show mpi compilers
         run: |
@@ -253,36 +265,17 @@ jobs:
           mpif90 -show
         if: ${{ matrix.mpi != 'msmpi' }}
 
-      - uses: fortran-lang/setup-fortran@v1.3
-        id: setup-fortran
-        with:
-          compiler: ${{ matrix.toolchain.compiler }}
-          version: ${{ matrix.toolchain.version }}
-
-      # - name: Setup mpi
-      #   uses: mpi4py/setup-mpi@v1
-      #   with:
-      #     mpi: ${{ matrix.mpi }}
-      #   if: runner.os != 'Linux'
-
-      # - name: Show mpi compilers
-      #   run: |
-      #     mpicc -show
-      #     mpicxx -show
-      #     mpif90 -show
-      #   if: ${{ matrix.mpi != 'msmpi' }}
-
       - name: Override CC/CXX compilers
         run: |
           echo "CC=gcc" >> $GITHUB_ENV
-          echo "CXX=g++" >> $GITHUB_ENV        
+          echo "CXX=g++" >> $GITHUB_ENV
         if: ${{ runner.os == 'Linux' }}
 
       - run: sudo apt-get -y update && sudo apt-get install -y ninja-build
         if: ${{ runner.os == 'Linux' }}
 
       - run: brew install ninja
-        if: ${{ runner.os == 'macOS' }}  
+        if: ${{ runner.os == 'macOS' }}
 
       - uses: actions/checkout@v3
 
