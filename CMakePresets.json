@@ -890,6 +890,30 @@
             "CXX": "icx",
             "FC": "ifx"
           }
+        },
+        {
+          "name": "ninja-intel-ifx-shared-msmpi-release",
+          "displayName": "ninja-intel-ifx-shared-msmpi-release",
+          "description": "Use Intel oneAPI command prompt to build",
+          "generator": "Ninja",
+          "condition": {
+            "type": "equals",
+            "lhs": "${hostSystemName}",
+            "rhs": "Windows"
+          },
+          "binaryDir": "${sourceDir}/build/${presetName}",
+          "cacheVariables": {
+            "BUILD_SHARED_LIBS": "ON",
+            "CMAKE_BUILD_TYPE": "Release",
+            "MPI_GUESS_LIBRARY_NAME": "MSMPI",
+            "PHREEQCRM_FORTRAN_TESTING": "ON",
+            "PHREEQCRM_BUILD_MPI": "ON"
+          },
+          "environment": {
+            "CC": "icx",
+            "CXX": "icx",
+            "FC": "ifx"
+          }
         }
       ],
     "buildPresets": [
