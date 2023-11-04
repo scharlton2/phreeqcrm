@@ -94,6 +94,10 @@ if(PHREEQCRM_FORTRAN_TESTING)
   # for compiling and linking the FortranAdvect library
   target_link_libraries(FortranAdvect PRIVATE PhreeqcRM::PhreeqcRM)
   if(PHREEQCRM_BUILD_MPI)
+    if(MPI_mpifptr_INCLUDE_DIR)
+      # Added for MSMPI -- CMake 3.26
+      target_include_directories(FortranAdvect PRIVATE ${MPI_mpifptr_INCLUDE_DIR})
+    endif()
     # INTERFACE_COMPILE_OPTIONS isn't transitive (when PRIVATE)
     # otherwise Fortran BMI compile options would show up in the
     # C/CXX compile options of any target that links to FortranAdvect
