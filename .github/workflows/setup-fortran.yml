@@ -170,6 +170,7 @@ jobs:
       #############################################################################################################
 
   mpi:
+    name: mpi(${{ matrix.mpi }})-${{ matrix.os }}-${{ matrix.toolchain.compiler }}(${{ matrix.toolchain.version }})(SHARED=${{ matrix.build_shared_libs }})(WITH_YAML_CPP=${{ matrix.phreeqcrm_with_yaml_cpp }})(FORTRAN_TESTING=${{ matrix.phreeqcrm_fortran_testing }})(BUILD_MPI=${{ matrix.phreeqcrm_build_mpi }})
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
@@ -226,15 +227,15 @@ jobs:
           - os: ubuntu-22.04
             toolchain: {compiler: intel-classic}
             mpi: 'ompi'
-          - os: ubuntu-22.04        
+          - os: ubuntu-22.04
             toolchain: {compiler: gcc, version: 9}  # gcc too old for mpich?
             mpi: 'mpich'
           - os: windows-2019
-            mpi: 'mpich'            
+            mpi: 'mpich'
           - os: windows-2019
             mpi: 'ompi'
           - os: windows-2022
-            mpi: 'mpich'            
+            mpi: 'mpich'
           - os: windows-2022
             mpi: 'ompi'
 
