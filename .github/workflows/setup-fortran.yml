@@ -246,6 +246,13 @@ jobs:
           mpi: ${{ matrix.mpi }}
         # if: runner.os == 'Linux'
 
+      - name: Show mpi compilers
+        run: |
+          mpicc -show
+          mpicxx -show
+          mpif90 -show
+        if: ${{ matrix.mpi != 'msmpi' }}
+
       - uses: fortran-lang/setup-fortran@v1.3
         id: setup-fortran
         with:
@@ -258,12 +265,12 @@ jobs:
       #     mpi: ${{ matrix.mpi }}
       #   if: runner.os != 'Linux'
 
-      - name: Show mpi compilers
-        run: |
-          mpicc -show
-          mpicxx -show
-          mpif90 -show
-        if: ${{ matrix.mpi != 'msmpi' }}
+      # - name: Show mpi compilers
+      #   run: |
+      #     mpicc -show
+      #     mpicxx -show
+      #     mpif90 -show
+      #   if: ${{ matrix.mpi != 'msmpi' }}
 
       - name: Override CC/CXX compilers
         run: |
