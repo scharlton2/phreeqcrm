@@ -316,6 +316,7 @@ jobs:
         if: ${{ matrix.phreeqcrm_with_yaml_cpp == 'ON' }}
 
       - run: |
+          set SETVARS_COMPLETED=
           %ComSpec% /E:ON /K ""C:\Program Files (x86)\Intel\oneAPI\setvars.bat" intel64 vs2019"
           cmake -G Ninja ^
           -B ${{ github.workspace }}/build-mpi ^
