@@ -176,7 +176,8 @@ jobs:
       fail-fast: false
       matrix:
         # os: [ubuntu-22.04, macos-12, windows-2019, windows-2022]
-        os: [windows-2019, windows-2022]
+        # os: [windows-2019, windows-2022]
+        os: [windows-2019]
         toolchain:
           # - {compiler: gcc, version: 9}
           - {compiler: gcc, version: 13}
@@ -318,7 +319,7 @@ jobs:
 
       - run: |
           set SETVARS_COMPLETED=
-          ""C:\Program Files (x86)\Intel\oneAPI\setvars.bat" intel64 vs2019"
+          "C:\Program Files (x86)\Intel\oneAPI\setvars.bat" intel64 vs2019
           cmake -G Ninja ^
           -B ${{ github.workspace }}/build-mpi ^
           -DBUILD_SHARED_LIBS:BOOL=${{ matrix.build_shared_libs }} ^
