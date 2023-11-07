@@ -192,8 +192,7 @@ jobs:
           - {compiler: intel-classic, version: '2021.10'}
         build_shared_libs: [ON]
         build_type: [Release]
-        # mpi: ['mpich', 'ompi', 'impi', 'msmpi']  # see https://github.com/mpi4py/setup-mpi/blob/master/setup-mpi.sh
-        mpi: ['impi']  # see https://github.com/mpi4py/setup-mpi/blob/master/setup-mpi.sh
+        mpi: ['mpich', 'ompi', 'impi', 'msmpi']  # see https://github.com/mpi4py/setup-mpi/blob/master/setup-mpi.sh
         phreeqcrm_build_mpi: [ON]
         phreeqcrm_fortran_testing: [ON]
         phreeqcrm_with_yaml_cpp: [OFF]
