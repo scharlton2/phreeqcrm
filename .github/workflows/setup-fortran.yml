@@ -319,6 +319,8 @@ jobs:
 
       - run: Get-Command cmake
 
+      - run: Get-Command ninja
+
       - run: Get-Content "C:\Program Files (x86)\Intel\oneAPI\setvars.bat"
 
       - run: |
