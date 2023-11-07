@@ -246,9 +246,9 @@ jobs:
         uses: mpi4py/setup-mpi@v1
         with:
           mpi: ${{ matrix.mpi }}
-        if: runner.os == 'Linux'
+        # if: runner.os == 'Linux'
 
-      - uses: scharlton2/setup-fortran@vs2019-integration
+      - uses: scharlton2/setup-fortran@v1.4
         id: setup-fortran
         with:
           compiler: ${{ matrix.toolchain.compiler }}
@@ -257,18 +257,18 @@ jobs:
       - run: dir $env:ONEAPI_ROOT/compiler
         if: runner.os == 'Windows'
 
-      - name: Setup mpi
-        uses: mpi4py/setup-mpi@v1
-        with:
-          mpi: ${{ matrix.mpi }}
-        if: runner.os != 'Linux'
+      # - name: Setup mpi
+      #   uses: mpi4py/setup-mpi@v1
+      #   with:
+      #     mpi: ${{ matrix.mpi }}
+      #   if: runner.os != 'Linux'
 
-      - name: Show mpi compilers
-        run: |
-          mpicc -show
-          mpicxx -show
-          mpif90 -show
-        if: ${{ matrix.mpi != 'msmpi' }}
+      # - name: Show mpi compilers
+      #   run: |
+      #     mpicc -show
+      #     mpicxx -show
+      #     mpif90 -show
+      #   if: ${{ matrix.mpi != 'msmpi' }}
 
       # - name: Override CC/CXX compilers
       #   run: |
@@ -299,10 +299,10 @@ jobs:
       - run: vcpkg install yaml-cpp:x64-windows
         if: ${{ runner.os == 'Windows' && matrix.phreeqcrm_with_yaml_cpp == 'ON' }}
   
-      - uses: egor-tensin/vs-shell@v2
-        if: runner.os == 'Windows'
-        with:
-          arch: x64
+      # - uses: egor-tensin/vs-shell@v2
+      #   if: runner.os == 'Windows'
+      #   with:
+      #     arch: x64
 
       - run: >
           cmake -G Ninja
@@ -324,10 +324,10 @@ jobs:
       - run: Get-Content "C:\Program Files (x86)\Intel\oneAPI\setvars.bat"
 
       - run: |
-          set PATH=C:\Windows\System32;C:\Program Files\CMake\bin;C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\Common7\IDE\CommonExtensions\Microsoft\CMake\Ninja
-          set SETVARS_COMPLETED=
-          call "C:\Program Files (x86)\Intel\oneAPI\setvars.bat" intel64 vs2019
-          set
+          # set PATH=C:\Windows\System32;C:\Program Files\CMake\bin;C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\Common7\IDE\CommonExtensions\Microsoft\CMake\Ninja
+          # set SETVARS_COMPLETED=
+          # call "C:\Program Files (x86)\Intel\oneAPI\setvars.bat" intel64 vs2019
+          # set
           where icl
           where icx
           where ifort
