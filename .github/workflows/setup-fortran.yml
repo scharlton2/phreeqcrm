@@ -245,7 +245,6 @@ jobs:
         uses: mpi4py/setup-mpi@v1
         with:
           mpi: ${{ matrix.mpi }}
-        # if: runner.os == 'Linux'
 
       - uses: scharlton2/setup-fortran@develop-setvars
         id: setup-fortran
@@ -255,12 +254,6 @@ jobs:
 
       - run: dir $env:ONEAPI_ROOT/compiler
         if: runner.os == 'Windows'
-
-      # - name: Setup mpi
-      #   uses: mpi4py/setup-mpi@v1
-      #   with:
-      #     mpi: ${{ matrix.mpi }}
-      #   if: runner.os != 'Linux'
 
       # - name: Show mpi compilers
       #   run: |
@@ -298,18 +291,17 @@ jobs:
       - run: vcpkg install yaml-cpp:x64-windows
         if: ${{ runner.os == 'Windows' && matrix.phreeqcrm_with_yaml_cpp == 'ON' }}
   
-      # - uses: egor-tensin/vs-shell@v2
-      #   if: runner.os == 'Windows'
-      #   with:
-      #     arch: x64
-
       - run: Get-Command cmake
+        if: ${{ runner.os == 'Windows' }}
 
       - run: Get-Command ninja
+        if: ${{ runner.os == 'Windows' }}
 
       - run: Get-Content "C:\Program Files (x86)\Intel\oneAPI\setvars.bat"
+        if: ${{ runner.os == 'Windows' }}
 
       - run: Get-FileHash "C:\Program Files (x86)\Intel\oneAPI\setvars.bat"
+        if: ${{ runner.os == 'Windows' }}
 
       - run: 'gci env: | Format-Table -Wrap -AutoSize'
         if: ${{ runner.os == 'Windows' }}
