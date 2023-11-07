@@ -248,7 +248,7 @@ jobs:
           mpi: ${{ matrix.mpi }}
         # if: runner.os == 'Linux'
 
-      - uses: scharlton2/setup-fortran@v1.4
+      - uses: scharlton2/setup-fortran@develop-setvars
         id: setup-fortran
         with:
           compiler: ${{ matrix.toolchain.compiler }}
@@ -322,6 +322,8 @@ jobs:
       - run: Get-Command ninja
 
       - run: Get-Content "C:\Program Files (x86)\Intel\oneAPI\setvars.bat"
+
+      - run: 'gci env: | Format-Table -Wrap -AutoSize'
 
       - run: |
           # set PATH=C:\Windows\System32;C:\Program Files\CMake\bin;C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\Common7\IDE\CommonExtensions\Microsoft\CMake\Ninja
