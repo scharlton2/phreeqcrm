@@ -324,7 +324,7 @@ jobs:
       - run: Get-Content "C:\Program Files (x86)\Intel\oneAPI\setvars.bat"
 
       - run: |
-          set PATH=C:\Windows\System32;C:\Program Files\CMake\bin;C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\Ninja
+          set PATH=C:\Windows\System32;C:\Program Files\CMake\bin;C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\Common7\IDE\CommonExtensions\Microsoft\CMake\Ninja
           set SETVARS_COMPLETED=
           call "C:\Program Files (x86)\Intel\oneAPI\setvars.bat" intel64 vs2019
           set
