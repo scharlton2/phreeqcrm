@@ -244,7 +244,7 @@ jobs:
         uses: mpi4py/setup-mpi@v1
         with:
           mpi: ${{ matrix.mpi }}
-        if: ${{ matrix.mpi != 'msmpi' }}
+        # if: ${{ matrix.mpi != 'msmpi' }}
 
       - uses: scharlton2/setup-fortran@develop-setvars
         id: setup-fortran
@@ -262,11 +262,11 @@ jobs:
       #     mpif90 -show
       #   if: ${{ matrix.mpi != 'msmpi' }}
 
-      - name: Setup mpi
-        uses: mpi4py/setup-mpi@v1
-        with:
-          mpi: ${{ matrix.mpi }}
-        if: ${{ matrix.mpi == 'msmpi' }}
+      # - name: Setup mpi
+      #   uses: mpi4py/setup-mpi@v1
+      #   with:
+      #     mpi: ${{ matrix.mpi }}
+      #   if: ${{ matrix.mpi == 'msmpi' }}
 
       - name: Disable Strawberry Path
         run: Move-Item C:\Strawberry C:\XXXStrawberry
