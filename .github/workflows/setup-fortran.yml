@@ -33,7 +33,7 @@ jobs:
           # - {compiler: intel-classic, version: '2021.9'}
           - {compiler: intel-classic, version: '2021.10'}
         build_shared_libs: [ON]
-        build_type: [Release]        
+        build_type: [Release]
         phreeqcrm_fortran_testing: [OFF]
         phreeqcrm_with_yaml_cpp: [OFF]
         exclude:
@@ -57,7 +57,7 @@ jobs:
             toolchain: {compiler: intel-classic, version: '2021.7'}
 
     steps:
-      - uses: scharlton2/setup-fortran@v1.4
+      - uses: scharlton2/setup-fortran@develop-setvars
         id: setup-fortran
         with:
           compiler: ${{ matrix.toolchain.compiler }}
@@ -116,7 +116,8 @@ jobs:
           arch: x64
 
       - run: >
-          cmake -G Ninja
+          cmake
+          -G Ninja
           -B ${{ github.workspace }}/build
           -DBUILD_SHARED_LIBS:BOOL=${{ matrix.build_shared_libs }}
           -DCMAKE_BUILD_TYPE=${{ matrix.build_type }}
@@ -128,7 +129,8 @@ jobs:
         if: ${{ matrix.phreeqcrm_with_yaml_cpp == 'ON' }}
 
       - run: >
-          cmake -G Ninja
+          cmake
+          -G Ninja
           -B ${{ github.workspace }}/build
           -DBUILD_SHARED_LIBS:BOOL=${{ matrix.build_shared_libs }}
           -DCMAKE_BUILD_TYPE=${{ matrix.build_type }}
@@ -175,8 +177,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        # os: [ubuntu-22.04, macos-12, windows-2019, windows-2022]
-        os: [windows-2019, windows-2022]
+        os: [ubuntu-22.04, macos-12, windows-2019, windows-2022]
         toolchain:
           # - {compiler: gcc, version: 9}
           - {compiler: gcc, version: 13}
