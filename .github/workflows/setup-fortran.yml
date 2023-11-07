@@ -320,7 +320,7 @@ jobs:
       - run: |
           set PATH=C:\Windows\System32
           set SETVARS_COMPLETED=
-          "C:\Program Files (x86)\Intel\oneAPI\setvars.bat" intel64 vs2019
+          call "C:\Program Files (x86)\Intel\oneAPI\setvars.bat" intel64 vs2019
           set
           where icl
           where icx
