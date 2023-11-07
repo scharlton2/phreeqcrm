@@ -248,7 +248,7 @@ jobs:
           mpi: ${{ matrix.mpi }}
         if: runner.os == 'Linux'
 
-      - uses: scharlton2/setup-fortran@v1.4
+      - uses: scharlton2/setup-fortran@vs2019-integration
         id: setup-fortran
         with:
           compiler: ${{ matrix.toolchain.compiler }}
