@@ -318,7 +318,7 @@ jobs:
         if: ${{ matrix.phreeqcrm_with_yaml_cpp == 'ON' }}
 
       - run: |
-          set PATH=C:\Windows\System32
+          REM set PATH=C:\Windows\System32
           set SETVARS_COMPLETED=
           call "C:\Program Files (x86)\Intel\oneAPI\setvars.bat" intel64 vs2019
           set
