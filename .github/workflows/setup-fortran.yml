@@ -244,6 +244,7 @@ jobs:
         uses: mpi4py/setup-mpi@v1
         with:
           mpi: ${{ matrix.mpi }}
+        if: ${{ matrix.mpi != 'msmpi' }}
 
       - uses: scharlton2/setup-fortran@develop-setvars
         id: setup-fortran
@@ -260,6 +261,12 @@ jobs:
       #     mpicxx -show
       #     mpif90 -show
       #   if: ${{ matrix.mpi != 'msmpi' }}
+
+      - name: Setup mpi
+        uses: mpi4py/setup-mpi@v1
+        with:
+          mpi: ${{ matrix.mpi }}
+        if: ${{ matrix.mpi == 'msmpi' }}
 
       # - name: Override CC/CXX compilers
       #   run: |
