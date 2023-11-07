@@ -340,7 +340,6 @@ jobs:
           -DPHREEQCRM_WITH_YAML_CPP=${{ matrix.phreeqcrm_with_yaml_cpp }}
           -S ${{ github.workspace }}
           -L
-        shell: cmd
         if: ${{ matrix.phreeqcrm_with_yaml_cpp != 'ON' }}
 
       - run: cmake --build ${{ github.workspace }}/build-mpi
