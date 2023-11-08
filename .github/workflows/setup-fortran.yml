@@ -212,6 +212,9 @@ jobs:
             toolchain: {compiler: gcc}
           # mpi
           - os: macos-12
+            toolchain: {compiler: intel-classic}
+            mpi: 'ompi'
+          - os: macos-12
             mpi: 'impi'
           - os: macos-12
             mpi: 'msmpi'
