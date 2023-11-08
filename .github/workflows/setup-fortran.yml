@@ -248,11 +248,11 @@ jobs:
           mpi: ${{ matrix.mpi }}
         # if: ${{ matrix.mpi != 'msmpi' }}
 
-      # - name: Install impi also
-      #   uses: mpi4py/setup-mpi@v1
-      #   with:
-      #     mpi: impi
-      #   if: ${{ matrix.mpi == 'msmpi' }}
+      - name: Install impi also
+        uses: mpi4py/setup-mpi@v1
+        with:
+          mpi: impi
+        if: ${{ matrix.mpi == 'msmpi' }}
 
       - uses: scharlton2/setup-fortran@develop-setvars
         id: setup-fortran
