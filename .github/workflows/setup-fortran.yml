@@ -172,12 +172,12 @@ jobs:
       #############################################################################################################
 
   mpi:
-    name: mpi(${{ matrix.mpi }})-${{ matrix.os }}-${{ matrix.toolchain.compiler }}(${{ matrix.toolchain.version }})(SHARED=${{ matrix.build_shared_libs }})(WITH_YAML_CPP=${{ matrix.phreeqcrm_with_yaml_cpp }})(FORTRAN_TESTING=${{ matrix.phreeqcrm_fortran_testing }})(BUILD_MPI=${{ matrix.phreeqcrm_build_mpi }})
+    name: ${{ matrix.os }}-${{ matrix.toolchain.compiler }}(${{ matrix.toolchain.version }})-${{ matrix.mpi }}-${{ matrix.build_shared_libs.tag }}-(YAML_CPP=${{ matrix.phreeqcrm_with_yaml_cpp }})(FORTRAN_TESTING=${{ matrix.phreeqcrm_fortran_testing }})(BUILD_MPI=${{ matrix.phreeqcrm_build_mpi }})
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-22.04, macos-12, windows-2019, windows-2022]
+        os: [macos-12, ubuntu-22.04, windows-2019, windows-2022]
         toolchain:
           # - {compiler: gcc, version: 9}
           - {compiler: gcc, version: 13}
@@ -191,7 +191,9 @@ jobs:
           # - {compiler: intel-classic, version: '2021.8'}
           # - {compiler: intel-classic, version: '2021.9'}
           - {compiler: intel-classic, version: '2021.10'}
-        build_shared_libs: [ON]
+        build_shared_libs:
+          - {value: ON, tag: shared}
+          - {value: OFF, tag: static}
         build_type: [Release]
         mpi: ['mpich', 'ompi', 'impi', 'msmpi']  # see https://github.com/mpi4py/setup-mpi/blob/master/setup-mpi.sh
         # mpi: ['msmpi']  # see https://github.com/mpi4py/setup-mpi/blob/master/setup-mpi.sh
@@ -286,7 +288,8 @@ jobs:
       - run: tar xvzf yaml-cpp-0.8.0.tar.gz
         if: ${{ matrix.phreeqcrm_with_yaml_cpp == 'ON' }}
 
-      - run: >
+      - name: cmake configure yaml-cpp
+        run: >
           cmake
           -G Ninja
           -B ${{ github.workspace }}/yaml-cpp-build
@@ -296,44 +299,25 @@ jobs:
           -L
         if: ${{ matrix.phreeqcrm_with_yaml_cpp == 'ON' }}
 
-      - run: cmake --build ${{ github.workspace }}/yaml-cpp-build
+      - name: cmake build yaml-cpp
+        run: cmake --build ${{ github.workspace }}/yaml-cpp-build
+        if: ${{ matrix.phreeqcrm_with_yaml_cpp == 'ON' }}
 
-      - run: cmake --build ${{ github.workspace }}/yaml-cpp-build --target install
+      - name: cmake install yaml-cpp
+        run: cmake --install ${{ github.workspace }}/yaml-cpp-build
+        if: ${{ matrix.phreeqcrm_with_yaml_cpp == 'ON' }}
 
-      - name: Set yaml-cpp_DIR env variable
+      - name: export yaml-cpp_DIR env variable
         shell: bash
         run: echo "yaml-cpp_DIR=${{ github.workspace }}/yaml-cpp/lib/cmake/yaml-cpp" >> $GITHUB_ENV
+        if: ${{ matrix.phreeqcrm_with_yaml_cpp == 'ON' }}
 
-      - run: Get-Command cmake
-        if: ${{ runner.os == 'Windows' }}
-
-      - run: Get-Command ninja
-        if: ${{ runner.os == 'Windows' }}
-
-      - run: Get-Content "C:\Program Files (x86)\Intel\oneAPI\setvars.bat"
-        if: ${{ runner.os == 'Windows' }}
-
-      - run: Get-FileHash "C:\Program Files (x86)\Intel\oneAPI\setvars.bat"
-        if: ${{ runner.os == 'Windows' }}
-
-      - run: 'gci env: | Format-Table -Wrap -AutoSize'
-        shell: pwsh
-        if: ${{ runner.os == 'Linux' || runner.os == 'Windows' }}
-
-      - run: |
-          where icl
-          where icx
-          where ifort
-          where ifx
-          where cmake
-          where ninja
-        if: ${{ runner.os == 'Windows' }}
-
-      - run: >
+      - name: cmake configure phreeqcrm
+        run: >
           cmake
           -G Ninja
           -B ${{ github.workspace }}/build-mpi
-          -DBUILD_SHARED_LIBS:BOOL=${{ matrix.build_shared_libs }}
+          -DBUILD_SHARED_LIBS:BOOL=${{ matrix.build_shared_libs.value }}
           -DCMAKE_BUILD_TYPE=${{ matrix.build_type }}
           -DPHREEQCRM_BUILD_MPI:BOOL=${{ matrix.phreeqcrm_build_mpi }}
           -DPHREEQCRM_FORTRAN_TESTING:BOOL=${{ matrix.phreeqcrm_fortran_testing }}
@@ -342,11 +326,12 @@ jobs:
           -L
         if: ${{ matrix.mpi != 'msmpi' }}
 
-      - run: >
+      - name: cmake configure (msmpi)
+        run: >
           cmake
           -G Ninja
           -B ${{ github.workspace }}/build-mpi
-          -DBUILD_SHARED_LIBS:BOOL=${{ matrix.build_shared_libs }}
+          -DBUILD_SHARED_LIBS:BOOL=${{ matrix.build_shared_libs.value }}
           -DCMAKE_BUILD_TYPE=${{ matrix.build_type }}
           -DMPI_GUESS_LIBRARY_NAME=MSMPI
           -DPHREEQCRM_BUILD_MPI:BOOL=${{ matrix.phreeqcrm_build_mpi }}
@@ -356,12 +341,87 @@ jobs:
           -L
         if: ${{ matrix.mpi == 'msmpi' }}
 
-      - run: cmake --build ${{ github.workspace }}/build-mpi
+      - name: cmake build
+        run: cmake --build ${{ github.workspace }}/build-mpi
 
-      - run: ctest --output-on-failure --test-dir ${{ github.workspace }}/build-mpi
+      - name: ctest
+        run: ctest --output-on-failure --test-dir ${{ github.workspace }}/build-mpi
         id: ctest
 
-      - run: cat ${{ github.workspace }}/build-mpi/Testing/Temporary/LastTest.log
+      - name: Display LastTest.log
+        run: cat ${{ github.workspace }}/build-mpi/Testing/Temporary/LastTest.log
         if: success() || steps.ctest.conclusion == 'failure'
 
-      - run: cat ${{ github.workspace }}/build-mpi/phreeqcrm.pc
+      - name: Display phreeqcrm.pc
+        run: cat ${{ github.workspace }}/build-mpi/phreeqcrm.pc
+
+  msvc:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [windows-2019, windows-2022]
+        build_shared_libs:
+          - {value: ON, tag: shared}
+          # - {value: OFF, tag: static}
+        build_type: [Release]
+        phreeqcrm_fortran_testing: [OFF]
+        phreeqcrm_with_yaml_cpp: [OFF]
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: download yaml-cpp archive
+        run: gh release download 0.8.0 --repo jbeder/yaml-cpp --archive tar.gz
+        env:
+          GH_TOKEN: ${{ github.token }}
+        if: ${{ matrix.phreeqcrm_with_yaml_cpp == 'ON' }}
+
+      - name: extract yaml-cpp
+        run: tar xvzf yaml-cpp-0.8.0.tar.gz
+        if: ${{ matrix.phreeqcrm_with_yaml_cpp == 'ON' }}
+
+      - name: cmake configure yaml-cpp
+        run: >
+          cmake
+          -B ${{ github.workspace }}/yaml-cpp-build
+          -DCMAKE_INSTALL_PREFIX=${{ github.workspace }}/yaml-cpp
+          -S ${{ github.workspace }}/yaml-cpp-0.8.0
+          -L
+        if: ${{ matrix.phreeqcrm_with_yaml_cpp == 'ON' }}
+
+      - name: cmake build yaml-cpp
+        run: cmake --build ${{ github.workspace }}/yaml-cpp-build --config ${{ matrix.build_type }}
+        if: ${{ matrix.phreeqcrm_with_yaml_cpp == 'ON' }}
+
+      - name: cmake install yaml-cpp
+        run: cmake --install ${{ github.workspace }}/yaml-cpp-build --config ${{ matrix.build_type }}
+        if: ${{ matrix.phreeqcrm_with_yaml_cpp == 'ON' }}
+
+      - name: export yaml-cpp_DIR env variable
+        shell: bash
+        run: echo "yaml-cpp_DIR=${{ github.workspace }}/yaml-cpp/lib/cmake/yaml-cpp" >> $GITHUB_ENV
+        if: ${{ matrix.phreeqcrm_with_yaml_cpp == 'ON' }}
+
+      - name: cmake configure phreeqcrm
+        run: >
+          cmake
+          -B ${{ github.workspace }}/build
+          -DBUILD_SHARED_LIBS:BOOL=${{ matrix.build_shared_libs.value }}
+          -DPHREEQCRM_FORTRAN_TESTING:BOOL=${{ matrix.phreeqcrm_fortran_testing }}
+          -DPHREEQCRM_WITH_YAML_CPP=${{ matrix.phreeqcrm_with_yaml_cpp }}
+          -S ${{ github.workspace }}
+          -L
+
+      - name: cmake build
+        run: cmake --build ${{ github.workspace }}/build --config ${{ matrix.build_type }}
+
+      - name: ctest
+        run: ctest -C ${{ matrix.build_type }} --output-on-failure --test-dir ${{ github.workspace }}/build
+        id: ctest
+
+      - name: Display LastTest.log
+        run: cat ${{ github.workspace }}/build/Testing/Temporary/LastTest.log
+        if: success() || steps.ctest.conclusion == 'failure'
+
+      - name: Display phreeqcrm.pc
+        run: cat ${{ github.workspace }}/build/phreeqcrm.pc
