@@ -57,6 +57,8 @@ jobs:
             toolchain: {compiler: intel-classic, version: '2021.7'}
 
     steps:
+      - uses: actions/checkout@v3
+
       - uses: scharlton2/setup-fortran@develop-setvars
         id: setup-fortran
         with:
@@ -78,8 +80,6 @@ jobs:
 
       - run: brew install ninja
         if: ${{ runner.os == 'macOS' }}
-
-      - uses: actions/checkout@v3
 
       - run: cmake -B setup-fortran/build -S setup-fortran -G Ninja -DCMAKE_BUILD_TYPE:STRING=Release
 
@@ -246,6 +246,8 @@ jobs:
             mpi: 'ompi'
 
     steps:
+      - uses: actions/checkout@v3
+
       - name: Setup mpi
         uses: mpi4py/setup-mpi@v1
         with:
@@ -329,8 +331,6 @@ jobs:
       - name: Update yaml-cpp_DIR
         shell: bash
         run: echo "yaml-cpp_DIR=${{ github.workspace }}/yaml-cpp/lib/cmake/yaml-cpp" >> $GITHUB_ENV
-
-      - uses: actions/checkout@v3
 
       # # Note: This allows ${{ env.VCPKG_INSTALLATION_ROOT }} to be used in the remaining steps
       # # Although its already set in the environment it can't be accessed using the env context
