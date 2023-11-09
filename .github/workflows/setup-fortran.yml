@@ -177,8 +177,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        # os: [ubuntu-22.04, macos-12, windows-2019, windows-2022]
-        os: [ubuntu-22.04, windows-2019]
+        os: [ubuntu-22.04, macos-12, windows-2019, windows-2022]
         toolchain:
           # - {compiler: gcc, version: 9}
           - {compiler: gcc, version: 13}
@@ -269,28 +268,9 @@ jobs:
       - run: dir $env:ONEAPI_ROOT/compiler
         if: runner.os == 'Windows'
 
-      # # - name: Show mpi compilers
-      # #   run: |
-      # #     mpicc -show
-      # #     mpicxx -show
-      # #     mpif90 -show
-      # #   if: ${{ matrix.mpi != 'msmpi' }}
-
-      # # - name: Setup mpi
-      # #   uses: mpi4py/setup-mpi@v1
-      # #   with:
-      # #     mpi: ${{ matrix.mpi }}
-      # #   if: ${{ matrix.mpi == 'msmpi' }}
-
       - name: Disable Strawberry Path
         run: Move-Item C:\Strawberry C:\XXXStrawberry
         if: ${{ matrix.mpi == 'msmpi' }}
-
-      # # - name: Override CC/CXX compilers
-      # #   run: |
-      # #     echo "CC=gcc" >> $GITHUB_ENV
-      # #     echo "CXX=g++" >> $GITHUB_ENV
-      # #   if: ${{ runner.os == 'Linux' }}
 
       - run: sudo apt-get -y update && sudo apt-get install -y ninja-build
         if: ${{ runner.os == 'Linux' }}
@@ -319,34 +299,11 @@ jobs:
       - run: cmake --build ${{ github.workspace }}/yaml-cpp-build
 
       - run: cmake --build ${{ github.workspace }}/yaml-cpp-build --target install
-      #   if: runner.os == 'Windows'
 
-      # - run: sudo cmake --build ${{ github.workspace }}/yaml-cpp-build --target install
-      #   if: runner.os != 'Windows'
-
-      # - name: Update CMAKE_PREFIX_PATH
-      #   shell: bash
-      #   run: echo "CMAKE_PREFIX_PATH=${{ github.workspace }}/yaml-cpp" >> $GITHUB_ENV
-
-      - name: Update yaml-cpp_DIR
+      - name: Set yaml-cpp_DIR env variable
         shell: bash
         run: echo "yaml-cpp_DIR=${{ github.workspace }}/yaml-cpp/lib/cmake/yaml-cpp" >> $GITHUB_ENV
 
-      # # Note: This allows ${{ env.VCPKG_INSTALLATION_ROOT }} to be used in the remaining steps
-      # # Although its already set in the environment it can't be accessed using the env context
-      # # until it is stored in the $GITHUB_ENV file
-      # - run: echo "VCPKG_INSTALLATION_ROOT=$VCPKG_INSTALLATION_ROOT" >> $GITHUB_ENV
-      #   shell: bash
-
-      # - run: vcpkg install yaml-cpp:x64-linux
-      #   if: ${{ runner.os == 'Linux' && matrix.phreeqcrm_with_yaml_cpp == 'ON' }}
-  
-      # - run: vcpkg install yaml-cpp:x64-osx
-      #   if: ${{ runner.os == 'macOS' && matrix.phreeqcrm_with_yaml_cpp == 'ON' }}
-  
-      # - run: vcpkg install yaml-cpp:x64-windows
-      #   if: ${{ runner.os == 'Windows' && matrix.phreeqcrm_with_yaml_cpp == 'ON' }}
-  
       - run: Get-Command cmake
         if: ${{ runner.os == 'Windows' }}
 
