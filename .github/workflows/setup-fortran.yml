@@ -309,6 +309,7 @@ jobs:
           -G Ninja
           -B ${{ github.workspace }}/yaml-cpp-build
           -DCMAKE_BUILD_TYPE=Release
+          -DCMAKE_INSTALL_PREFIX=${{ github.workspace }}/yaml-cpp
           -S ${{ github.workspace }}/yaml-cpp-0.8.0
           -L
         if: ${{ matrix.phreeqcrm_with_yaml_cpp == 'ON' }}
@@ -316,14 +317,18 @@ jobs:
       - run: cmake --build ${{ github.workspace }}/yaml-cpp-build
 
       - run: cmake --build ${{ github.workspace }}/yaml-cpp-build --target install
-        if: runner.os == 'Windows'
+      #   if: runner.os == 'Windows'
 
-      - run: sudo cmake --build ${{ github.workspace }}/yaml-cpp-build --target install
-        if: runner.os != 'Windows'
+      # - run: sudo cmake --build ${{ github.workspace }}/yaml-cpp-build --target install
+      #   if: runner.os != 'Windows'
 
       # - name: Update CMAKE_PREFIX_PATH
       #   shell: bash
       #   run: echo "CMAKE_PREFIX_PATH=${{ github.workspace }}/yaml-cpp" >> $GITHUB_ENV
+
+      - name: Update yaml-cpp_DIR
+        shell: bash
+        run: echo "yaml-cpp_DIR=${{ github.workspace }}/yaml-cpp/lib/cmake/yaml-cpp" >> $GITHUB_ENV
 
       - uses: actions/checkout@v3
 
