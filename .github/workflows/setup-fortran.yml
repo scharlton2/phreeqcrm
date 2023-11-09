@@ -266,6 +266,35 @@ jobs:
       - run: dir $env:ONEAPI_ROOT/compiler
         if: runner.os == 'Windows'
 
+      # # - name: Show mpi compilers
+      # #   run: |
+      # #     mpicc -show
+      # #     mpicxx -show
+      # #     mpif90 -show
+      # #   if: ${{ matrix.mpi != 'msmpi' }}
+
+      # # - name: Setup mpi
+      # #   uses: mpi4py/setup-mpi@v1
+      # #   with:
+      # #     mpi: ${{ matrix.mpi }}
+      # #   if: ${{ matrix.mpi == 'msmpi' }}
+
+      - name: Disable Strawberry Path
+        run: Move-Item C:\Strawberry C:\XXXStrawberry
+        if: ${{ matrix.mpi == 'msmpi' }}
+
+      # # - name: Override CC/CXX compilers
+      # #   run: |
+      # #     echo "CC=gcc" >> $GITHUB_ENV
+      # #     echo "CXX=g++" >> $GITHUB_ENV
+      # #   if: ${{ runner.os == 'Linux' }}
+
+      - run: sudo apt-get -y update && sudo apt-get install -y ninja-build
+        if: ${{ runner.os == 'Linux' }}
+
+      - run: brew install ninja
+        if: ${{ runner.os == 'macOS' }}
+
       - run: gh release download 0.8.0 --repo jbeder/yaml-cpp --archive tar.gz
         env:
           GH_TOKEN: ${{ github.token }}
@@ -283,38 +312,9 @@ jobs:
           -S ${{ github.workspace }}/yaml-cpp-0.8.0
         if: ${{ matrix.phreeqcrm_with_yaml_cpp == 'ON' }}
 
-      - run: cmake --build ${{ github.workspace }}/yaml-cpp --target install
+      - run: cmake --build ${{ github.workspace }}/yaml-cpp-build --target install
 
       - run: ls
-
-      # # - name: Show mpi compilers
-      # #   run: |
-      # #     mpicc -show
-      # #     mpicxx -show
-      # #     mpif90 -show
-      # #   if: ${{ matrix.mpi != 'msmpi' }}
-
-      # # - name: Setup mpi
-      # #   uses: mpi4py/setup-mpi@v1
-      # #   with:
-      # #     mpi: ${{ matrix.mpi }}
-      # #   if: ${{ matrix.mpi == 'msmpi' }}
-
-      # - name: Disable Strawberry Path
-      #   run: Move-Item C:\Strawberry C:\XXXStrawberry
-      #   if: ${{ matrix.mpi == 'msmpi' }}
-
-      # # - name: Override CC/CXX compilers
-      # #   run: |
-      # #     echo "CC=gcc" >> $GITHUB_ENV
-      # #     echo "CXX=g++" >> $GITHUB_ENV
-      # #   if: ${{ runner.os == 'Linux' }}
-
-      # - run: sudo apt-get -y update && sudo apt-get install -y ninja-build
-      #   if: ${{ runner.os == 'Linux' }}
-
-      # - run: brew install ninja
-      #   if: ${{ runner.os == 'macOS' }}
 
       # - uses: actions/checkout@v3
 
