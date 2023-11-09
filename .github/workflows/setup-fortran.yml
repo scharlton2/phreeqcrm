@@ -267,6 +267,8 @@ jobs:
         if: runner.os == 'Windows'
 
       - run: gh release download 0.8.0 --repo jbeder/yaml-cpp --archive tar.gz
+        env:
+          GH_TOKEN: ${{ github.token }}
         if: ${{ matrix.phreeqcrm_with_yaml_cpp == 'ON' }}
 
       - run: tar xvzf yaml-cpp-0.8.0.tar.gz
