@@ -331,7 +331,6 @@ jobs:
 
       - run: >
           cmake
-          --debug-find-pkg=yaml-cpp
           -G Ninja
           -B ${{ github.workspace }}/build-mpi
           -DBUILD_SHARED_LIBS:BOOL=${{ matrix.build_shared_libs }}
@@ -345,7 +344,6 @@ jobs:
 
       - run: >
           cmake
-          --debug-find-pkg=yaml-cpp
           -G Ninja
           -B ${{ github.workspace }}/build-mpi
           -DBUILD_SHARED_LIBS:BOOL=${{ matrix.build_shared_libs }}
