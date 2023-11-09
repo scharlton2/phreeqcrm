@@ -317,7 +317,7 @@ jobs:
 
       - name: Update CMAKE_PREFIX_PATH
         shell: bash
-        run: echo "CMAKE_PREFIX_PATH=$CMAKE_PREFIX_PATH:${{ github.workspace }}/yaml-cpp" >> $GITHUB_ENV
+        run: echo "CMAKE_PREFIX_PATH=${{ github.workspace }}/yaml-cpp" >> $GITHUB_ENV
 
       - uses: actions/checkout@v3
 
