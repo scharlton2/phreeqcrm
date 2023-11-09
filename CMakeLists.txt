@@ -22,12 +22,14 @@ if(WIN32 AND NOT CMAKE_INSTALL_DOCDIR)
 endif()
 
 include(GNUInstallDirs)
+include(CMakeDependentOption)
 
 option(PHREEQCRM_FORTRAN_TESTING "Build Fortran test" OFF)
 if(PHREEQCRM_FORTRAN_TESTING)
   enable_language(Fortran)
 endif()
 
+# check for yaml-cpp
 option(PHREEQCRM_WITH_YAML_CPP "Build with yaml-cpp support" OFF)
 if(DEFINED SKBUILD)
   set(PHREEQCRM_WITH_YAML_CPP ON)
@@ -39,22 +41,21 @@ if(PHREEQCRM_WITH_YAML_CPP)
   endif()
 endif()
 
-option(PHREEQCRM_DISABLE_OPENMP "Disable openmp" OFF)
+# check for MPI
+option(PHREEQCRM_BUILD_MPI "Build MPI configuration" OFF)
+if(PHREEQCRM_BUILD_MPI)
+  find_package(MPI REQUIRED)
+endif()
+
+# check for openmp
+cmake_dependent_option(PHREEQCRM_DISABLE_OPENMP "Disable OpenMP" OFF "NOT PHREEQCRM_BUILD_MPI" ON)
 if(NOT PHREEQCRM_DISABLE_OPENMP)
   if(STANDALONE_BUILD EQUAL 1)
-    # check for openmp
     find_package(OpenMP)
   endif()
 endif()
 
-# check for MPI
-option(PHREEQCRM_BUILD_MPI "Build MPI configuration" OFF)
-if(PHREEQCRM_BUILD_MPI)
-  ##set(CMAKE_FIND_DEBUG_MODE TRUE)
-  find_package(MPI REQUIRED)
-  ##set(CMAKE_FIND_DEBUG_MODE FALSE)
-endif()
-
+# check for python binding
 option(PHREEQCRM_BUILD_PYTHON "Build python wrapper using SWIG" OFF)
 if(DEFINED SKBUILD)
   set(PHREEQCRM_BUILD_PYTHON ON)
@@ -69,6 +70,7 @@ if(PHREEQCRM_BUILD_PYTHON)
   # ie -DPython_ROOT_DIR=C:/Python38-x64
 endif()
 
+# check for utf-8 encoding
 option(PHREEQCRM_NO_UTF8_ENCODING "Build without utf-8 encoding" OFF)
 
 set(PhreeqcRM_SOURCES
@@ -278,7 +280,7 @@ target_compile_definitions(PhreeqcRM PRIVATE SWIG_SHARED_OBJ)
 target_compile_definitions(PhreeqcRM PRIVATE USE_PHRQ_ALLOC)
 target_compile_definitions(PhreeqcRM PRIVATE IPhreeqc_EXPORTS)
 
-if (PHREEQCRM_NO_UTF8_ENCODING)
+if(PHREEQCRM_NO_UTF8_ENCODING)
   target_compile_definitions(PhreeqcRM PRIVATE NO_UTF8_ENCODING)
 endif()
 
@@ -289,7 +291,7 @@ if(MSVC_VERSION EQUAL 1400 OR MSVC_VERSION GREATER 1400)
   target_compile_definitions(PhreeqcRM PRIVATE _SCL_SECURE_NO_WARNINGS)
 endif()
 
-if (WIN32 AND BUILD_SHARED_LIBS)
+if(WIN32 AND BUILD_SHARED_LIBS)
   # Required to build IMPLIB
   # (Seems to be automatically set when using Visual Studio as the generator)
   # This is only necessary to export iphreeqc methods
@@ -336,14 +338,9 @@ if(NOT CMAKE_DEBUG_POSTFIX)
   set_target_properties(PhreeqcRM PROPERTIES DEBUG_POSTFIX "d")
 endif()
 
-# # At least with MSMPI PhreeqcRM.dll requires MPI_CXX_LIBRARIES to link
-# if(MSVC AND BUILD_SHARED_LIBS AND PHREEQCRM_BUILD_MPI)
-#   target_link_libraries(PhreeqcRM ${MPI_CXX_LIBRARIES})
+# if(MSVC AND BUILD_SHARED_LIBS AND PHREEQCRM_USE_ZLIB AND ZLIB_FOUND)
+#   target_link_libraries(PhreeqcRM ${ZLIB_LIBRARIES})
 # endif()
-
-if(MSVC AND BUILD_SHARED_LIBS AND PHREEQCRM_USE_ZLIB AND ZLIB_FOUND)
-  target_link_libraries(PhreeqcRM ${ZLIB_LIBRARIES})
-endif()
 
 set(PhreeqcRM_Headers
   ${PhreeqcRM_BINARY_DIR}/irm_dll_export.h
@@ -566,10 +563,9 @@ endif()
 if(PHREEQCRM_DUMP_VARS)
   message(STATUS "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX")
   get_cmake_property(_variableNames VARIABLES)
-  list (SORT _variableNames)
-  foreach (_variableName ${_variableNames})
+  list(SORT _variableNames)
+  foreach(_variableName ${_variableNames})
     message(STATUS "${_variableName}=${${_variableName}}")
   endforeach()
-  mark_as_advanced(PHREEQCRM_DUMP_VARS)
   message(STATUS "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX")
 endif()
