@@ -386,6 +386,7 @@ jobs:
       - name: cmake configure yaml-cpp
         run: >
           cmake
+          -G "${{ matrix.system.generator }}"
           -B ${{ github.workspace }}/yaml-cpp-build
           -DCMAKE_INSTALL_PREFIX=${{ github.workspace }}/yaml-cpp
           -S ${{ github.workspace }}/yaml-cpp-0.8.0
@@ -408,7 +409,7 @@ jobs:
       - name: cmake configure phreeqcrm
         run: >
           cmake
-          -G ${{ matrix.system.generator }}
+          -G "${{ matrix.system.generator }}"
           -B ${{ github.workspace }}/build
           -DBUILD_SHARED_LIBS:BOOL=${{ matrix.build_shared_libs.value }}
           -DPHREEQCRM_FORTRAN_TESTING:BOOL=${{ matrix.phreeqcrm_fortran_testing }}
