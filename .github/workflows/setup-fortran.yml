@@ -433,7 +433,7 @@ jobs:
       - name: Display phreeqcrm.pc
         run: cat ${{ github.workspace }}/build/phreeqcrm.pc
 
-  msvc-intel:
+  msvc-toolset:
     name: ${{ matrix.system.tag }}-${{ matrix.toolchain.compiler }}-${{ matrix.build_shared_libs.tag }}-(YAML_CPP=${{ matrix.phreeqcrm_with_yaml_cpp }})(FORTRAN_TESTING=${{ matrix.phreeqcrm_fortran_testing }})
     runs-on: ${{ matrix.system.os }}
     strategy:
@@ -441,7 +441,7 @@ jobs:
       matrix:
         system:
           - {os: windows-2019, generator: 'Visual Studio 16 2019', tag: vs2019}
-          - {os: windows-2022, generator: 'Visual Studio 17 2022', tag: vs2022}
+          # - {os: windows-2022, generator: 'Visual Studio 17 2022', tag: vs2022}
         toolchain:
           - {compiler: intel, version: '2023.2', toolset: 'Intel C++ Compiler 2023'}
           - {compiler: intel-classic, version: '2021.10', toolset: 'Intel C++ Compiler 19.2'}
@@ -466,7 +466,7 @@ jobs:
       #     mpi: impi
       #   if: ${{ matrix.mpi == 'msmpi' }}
 
-      - uses: scharlton2/setup-fortran@develop-setvars
+      - uses: scharlton2/setup-fortran@develop-setvars-vs2019-integration
         id: setup-fortran
         with:
           compiler: ${{ matrix.toolchain.compiler }}
