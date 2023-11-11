@@ -466,13 +466,16 @@ jobs:
       #     mpi: impi
       #   if: ${{ matrix.mpi == 'msmpi' }}
 
-      - uses: scharlton2/setup-fortran@develop-setvars-vs2019-integration
+      - uses: scharlton2/setup-fortran@develop-setvars-vs2019-integration-cache-v160
         id: setup-fortran
         with:
           compiler: ${{ matrix.toolchain.compiler }}
           version: ${{ matrix.toolchain.version }}
 
       - run: dir $env:ONEAPI_ROOT/compiler
+        if: runner.os == 'Windows'
+
+      - run: 'dir C:/Program Files (x86)/Microsoft Visual Studio/2019/Enterprise/MSBuild/Microsoft/VC/v160'
         if: runner.os == 'Windows'
 
       - name: download yaml-cpp archive
