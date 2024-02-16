@@ -1,0 +1,10 @@
+name: bmi-yaml-cpp
+channels:
+- conda-forge
+dependencies:
+- conda-forge::bmi-c
+- conda-forge::bmi-cxx
+- conda-forge::bmi-fortran
+- conda-forge::pkg-config
+- conda-forge::yaml-cpp
+

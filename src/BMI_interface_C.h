@@ -1,4 +1,33 @@
-#ifdef SKIP
+#if !defined(BMI_INTERFACE_C_H_INCLUDED)
+#define BMI_INTERFACE_C_H_INCLUDED
+
+#if defined(__cplusplus)
+extern "C" {
+#endif
+
+#include <bmi.h>
+
+typedef struct PhreeqcRMBmi {
+  struct Bmi bmi;
+  // todo
+} PhreeqcRMBmi;
+
+
+PhreeqcRMBmi* register_bmi_phreeqcrm(PhreeqcRMBmi *model);
+void* new_bmi_phreeqcrm(void);
+
+
+#if defined(__cplusplus)
+}
+#endif
+
+#endif // BMI_INTERFACE_C_H_INCLUDED
+
+
+
+
+
+#if SKIP
 /*! @file BMI_interface_C.h
 	@brief C header file for BMIPhreeqcRM.
 */
@@ -168,7 +197,7 @@ extern "C" {
     @retval        The current simulation time, in seconds.
     @see
     @ref BMI_GetEndTime,
-    @ref BMI_GetTimeStep,
+    @ref get_time_step,
     @ref BMI_GetTime.
     @par C example:
     @htmlonly
@@ -1221,10 +1250,10 @@ extern "C" {
     @a BMI_GetGridNodesPerFace is not implemented.
     */
     IRM_DLL_EXPORT void BMI_GetGridNodesPerFace(int id, const int grid, int* nodes_per_face);
-#endif #SKIP
+#endif // #SKIP
 #if defined(__cplusplus)
 }
 
 #endif // BMI_INTERFACE_C_H_INCLUDED
 
-#endif #SKIP
+#endif // SKIP

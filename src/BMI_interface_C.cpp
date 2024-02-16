@@ -24,7 +24,6 @@
 //	while (sofar++ < len)
 //		*dest++ = ' ';
 //}
-#ifdef SKIP
 static IRM_RESULT
 rmpadfstring(char* dest, const char* src, int len)
 {
@@ -48,6 +47,7 @@ rmpadfstring(char* dest, const char* src, int len)
 		return IRM_INVALIDARG;
 	}
 }
+#ifdef SKIP
 #ifdef USE_MPI
 /* ---------------------------------------------------------------------- */
 int
@@ -699,3 +699,486 @@ BMI_GetGridNodesPerFace(int id, const int grid, int* nodes_per_face)
 	fprintf(stderr, "Not implemented\n"); exit(4);
 }
 #endif
+
+#define NEW_BMI_C_INTERFACE
+#if defined(NEW_BMI_C_INTERFACE)
+
+// /* ---------------------------------------------------------------------- */
+// IRM_RESULT
+// BMI_GetComponentName(int id, char* chem_name, int l1)
+// /* ---------------------------------------------------------------------- */
+// {
+// 	// Returns ith output variable name
+// 	BMIPhreeqcRM* bmirm_ptr = BMIPhreeqcRM::GetInstance(id);
+// 	if (bmirm_ptr)
+// 	{
+// 		std::string str = bmirm_ptr->GetComponentName();
+// 		return rmpadfstring(chem_name, str.c_str(), l1);
+// 	}
+// 	return IRM_BADINSTANCE;
+// }
+
+
+// /* ---------------------------------------------------------------------- */
+// IRM_RESULT
+// RMF_BMI_Initialize(int* id, char* config_file)
+// /* ---------------------------------------------------------------------- */
+// {
+// 	// Returns units of variable var
+// 	BMIPhreeqcRM* bmirm_ptr = BMIPhreeqcRM::GetInstance(*id);
+// 	if (bmirm_ptr)
+// 	{
+// 		bmirm_ptr->Initialize(config_file);
+// 		return IRM_OK;
+// 	}
+// 	return IRM_BADINSTANCE;
+// }
+
+static int
+Get_start_time(Bmi *self, double *time)
+{
+	try
+	{
+		BMIPhreeqcRM* bmirm_ptr = static_cast<BMIPhreeqcRM*>(self->data);
+		if (bmirm_ptr)
+		{
+			*time = bmirm_ptr->GetStartTime();
+			return IRM_OK;
+		}
+		return IRM_BADINSTANCE;
+	}
+	catch(...)
+	{
+		return BMI_FAILURE;
+	}
+}
+
+static int
+Get_end_time(Bmi *self, double *time)
+{
+	try
+	{
+		BMIPhreeqcRM* bmirm_ptr = static_cast<BMIPhreeqcRM*>(self->data);	
+		if (bmirm_ptr)
+		{
+			*time = bmirm_ptr->GetEndTime();
+			return BMI_SUCCESS;
+		}
+		return IRM_BADINSTANCE;	
+	}
+	catch(...)
+	{
+		return BMI_FAILURE;
+	}
+}
+
+static int
+Get_time_step(Bmi *self, double *dt)
+{
+	try
+	{
+		BMIPhreeqcRM* bmirm_ptr = static_cast<BMIPhreeqcRM*>(self->data);	
+		if (bmirm_ptr)
+		{
+			*dt = bmirm_ptr->GetTimeStep();
+			return BMI_SUCCESS;
+		}
+		return IRM_BADINSTANCE;	
+	}
+	catch(...)
+	{
+		return BMI_FAILURE;
+	}
+}
+
+static int
+Get_time_units(Bmi *self, char *units)
+{
+	try
+	{
+		BMIPhreeqcRM* bmirm_ptr = static_cast<BMIPhreeqcRM*>(self->data);
+		if (bmirm_ptr)
+		{
+			std::string str = bmirm_ptr->GetComponentName();
+			//strncpy(units, str.c_str(), BMI_MAX_UNITS_NAME);
+			return rmpadfstring(units, str.c_str(), BMI_MAX_UNITS_NAME);
+		}
+		return IRM_BADINSTANCE;
+	}
+	catch(...)
+	{
+		return BMI_FAILURE;
+	}
+}
+
+static int
+Get_current_time(Bmi *self, double *time)
+{
+	try
+	{
+		BMIPhreeqcRM* bmirm_ptr = static_cast<BMIPhreeqcRM*>(self->data);
+		if (bmirm_ptr)
+		{
+			*time = bmirm_ptr->GetCurrentTime();
+			return BMI_SUCCESS;
+		}
+		return IRM_BADINSTANCE;
+	}
+	catch(...)
+	{
+		return BMI_FAILURE;
+	}
+}
+
+static int
+Initialize(Bmi *self, const char *file)
+{
+	try
+	{
+		BMIPhreeqcRM* bmirm_ptr = static_cast<BMIPhreeqcRM*>(self->data);
+		if (bmirm_ptr)
+		{
+			bmirm_ptr->Initialize(file ? file : std::string());
+			return IRM_OK;
+		}
+		return IRM_BADINSTANCE;
+	}
+	catch(...)
+	{
+		return BMI_FAILURE;
+	}
+}
+
+static int
+Update(Bmi *self)
+{
+	try
+	{
+		BMIPhreeqcRM* bmirm_ptr = static_cast<BMIPhreeqcRM*>(self->data);	
+		if (bmirm_ptr)
+		{
+			bmirm_ptr->Update();
+			return BMI_SUCCESS;
+		}
+		return IRM_BADINSTANCE;	
+	}
+	catch(...)
+	{
+		return BMI_FAILURE;
+	}
+}
+
+static int
+Update_until(Bmi *self)
+{
+	// TODO
+	assert(false);
+}
+
+static int
+Finalize(Bmi *self)
+{
+	try 
+	{
+		if (self)
+		{
+			delete ((BMIPhreeqcRM*)(self->data));
+			self->data = (void*)new_bmi_phreeqcrm();
+		}
+		return BMI_SUCCESS;
+	}
+	catch(...)
+	{
+		return BMI_FAILURE;
+	}
+}
+
+static int
+Get_grid_rank(Bmi *self, int grid, int *rank)
+{
+	try 
+	{
+		BMIPhreeqcRM* bmirm_ptr = static_cast<BMIPhreeqcRM*>(self->data);	
+		if (bmirm_ptr)
+		{
+			*rank = bmirm_ptr->GetGridRank(grid);
+			return BMI_SUCCESS;
+		}
+		return IRM_BADINSTANCE;	
+	}
+	catch(...)
+	{
+		return BMI_FAILURE;
+	}
+}
+
+static int
+Get_grid_size(Bmi *self, int grid, int *size)
+{
+	try 
+	{
+		BMIPhreeqcRM* bmirm_ptr = static_cast<BMIPhreeqcRM*>(self->data);	
+		if (bmirm_ptr)
+		{
+			*size = bmirm_ptr->GetGridSize(grid);
+			return BMI_SUCCESS;
+		}
+		return IRM_BADINSTANCE;	
+	}
+	catch(...)
+	{
+		return BMI_FAILURE;
+	}
+}
+
+static int
+Get_grid_spacing(Bmi *self, int grid, double *spacing)
+{
+	try 
+	{
+		BMIPhreeqcRM* bmirm_ptr = static_cast<BMIPhreeqcRM*>(self->data);
+		if (bmirm_ptr)
+		{
+			bmirm_ptr->GetGridSpacing(grid, spacing);
+			return BMI_SUCCESS;
+		}
+		return IRM_BADINSTANCE;	
+	}
+	catch(...)
+	{
+		return BMI_FAILURE;
+	}
+}
+
+static int
+Get_grid_origin(Bmi *self, int grid, double *origin)
+{
+	try 
+	{
+		BMIPhreeqcRM* bmirm_ptr = static_cast<BMIPhreeqcRM*>(self->data);
+		if (bmirm_ptr)
+		{
+			bmirm_ptr->GetGridOrigin(grid, origin);
+			return BMI_SUCCESS;
+		}
+		return IRM_BADINSTANCE;	
+	}
+	catch(...)
+	{
+		return BMI_FAILURE;
+	}
+}
+
+static int
+Get_grid_type(Bmi *self, int grid, char *type)
+{
+	try 
+	{
+		BMIPhreeqcRM* bmirm_ptr = static_cast<BMIPhreeqcRM*>(self->data);
+		if (bmirm_ptr)
+		{
+			std::string str = bmirm_ptr->GetGridType(grid);
+			//strncpy(type, str.c_str(), BMI_MAX_TYPE_NAME);
+			return rmpadfstring(type, str.c_str(), BMI_MAX_TYPE_NAME);
+		}
+		return IRM_BADINSTANCE;	
+	}
+	catch(...)
+	{
+		return BMI_FAILURE;
+	}
+}
+
+static int
+Get_var_grid(Bmi *self, const char *name, int *grid)
+{
+	try 
+	{
+		BMIPhreeqcRM* bmirm_ptr = static_cast<BMIPhreeqcRM*>(self->data);
+		if (bmirm_ptr)
+		{
+			*grid = bmirm_ptr->GetVarGrid(name);
+			return BMI_SUCCESS;
+		}
+		return IRM_BADINSTANCE;	
+	}
+	catch(...)
+	{
+		return BMI_FAILURE;
+	}
+}
+
+static int
+Get_var_type(Bmi *self, const char *name, char *type)
+{
+	try 
+	{
+		BMIPhreeqcRM* bmirm_ptr = static_cast<BMIPhreeqcRM*>(self->data);
+		if (bmirm_ptr)
+		{
+			std::string str = bmirm_ptr->GetVarType(name);
+			//strncpy(type, str.c_str(), BMI_MAX_TYPE_NAME);
+			return rmpadfstring(type, str.c_str(), BMI_MAX_TYPE_NAME);
+		}
+		return IRM_BADINSTANCE;	
+	}
+	catch(...)
+	{
+		return BMI_FAILURE;
+	}
+}
+
+static int
+Get_var_itemsize(Bmi *self, const char *name, int *size)
+{
+	try 
+	{
+		BMIPhreeqcRM* bmirm_ptr = static_cast<BMIPhreeqcRM*>(self->data);
+		if (bmirm_ptr)
+		{
+			*size = bmirm_ptr->GetVarItemsize(name);
+			return BMI_SUCCESS;
+		}
+		return IRM_BADINSTANCE;
+	}
+	catch(...)
+	{
+		return BMI_FAILURE;
+	}
+}
+
+static int
+Get_var_units(Bmi *self, const char *name, char *units)
+{
+	BMIPhreeqcRM* bmirm_ptr = static_cast<BMIPhreeqcRM*>(self->data);
+	if (bmirm_ptr)
+	{
+		std::string str = bmirm_ptr->GetVarUnits(name);
+		//strncpy(units, str.c_str(), BMI_MAX_UNITS_NAME);
+		return rmpadfstring(units, str.c_str(), BMI_MAX_UNITS_NAME);
+	}
+	return IRM_BADINSTANCE;
+}
+
+static int
+Get_var_nbytes(Bmi *self, const char *name, int *nbytes)
+{
+	BMIPhreeqcRM* bmirm_ptr = static_cast<BMIPhreeqcRM*>(self->data);
+	if (bmirm_ptr)
+	{
+		*nbytes = bmirm_ptr->GetVarNbytes(name);
+		return BMI_SUCCESS;
+	}
+	return IRM_BADINSTANCE;
+}
+
+static int
+Get_var_location(Bmi *self, const char *name, char *location)
+{
+	BMIPhreeqcRM* bmirm_ptr = static_cast<BMIPhreeqcRM*>(self->data);
+	if (bmirm_ptr)
+	{
+		std::string str = bmirm_ptr->GetVarLocation(name);
+		//strncpy(location, str.c_str(), BMI_MAX_UNITS_NAME);
+		return rmpadfstring(location, str.c_str(), BMI_MAX_UNITS_NAME);
+	}
+	return IRM_BADINSTANCE;
+}
+
+static int
+Get_value_ptr(Bmi *self, const char *name, void **dest)
+{
+	BMIPhreeqcRM* bmirm_ptr = static_cast<BMIPhreeqcRM*>(self->data);
+	if (bmirm_ptr)
+	{
+		*dest = bmirm_ptr->GetValuePtr(name);
+		return BMI_SUCCESS;
+	}
+	return IRM_BADINSTANCE;
+}
+
+void *
+new_bmi_phreeqcrm(void)
+{
+  BMIPhreeqcRM* data = new BMIPhreeqcRM;
+  return data;
+}
+
+static int
+Get_component_name(Bmi *self, char *name)
+{
+	BMIPhreeqcRM* bmirm_ptr = static_cast<BMIPhreeqcRM*>(self->data);
+	if (bmirm_ptr)
+	{
+		std::string str = bmirm_ptr->GetComponentName();
+		//strncpy(name, str.c_str(), BMI_MAX_COMPONENT_NAME);
+		return rmpadfstring(name, str.c_str(), BMI_MAX_COMPONENT_NAME);
+	}
+	return IRM_BADINSTANCE;
+}
+
+PhreeqcRMBmi*
+register_bmi_phreeqcrm(PhreeqcRMBmi *model)
+{
+  Bmi* bmi_model = (Bmi*) model;
+  if (bmi_model) {
+
+	bmi_model->data = new_bmi_phreeqcrm();
+
+    bmi_model->initialize = Initialize;
+    bmi_model->update = Update;
+    bmi_model->update_until = nullptr;
+    bmi_model->finalize = nullptr;
+
+    bmi_model->get_component_name = Get_component_name;
+    bmi_model->get_input_item_count = nullptr;
+    bmi_model->get_output_item_count = nullptr;
+    bmi_model->get_input_var_names = nullptr;
+    bmi_model->get_output_var_names = nullptr;
+
+    bmi_model->get_var_grid = nullptr;
+    bmi_model->get_var_type = nullptr;
+    bmi_model->get_var_itemsize = nullptr;
+    bmi_model->get_var_units = nullptr;
+    bmi_model->get_var_nbytes = nullptr;
+    bmi_model->get_var_location = nullptr;
+
+    bmi_model->get_current_time = nullptr;
+    bmi_model->get_start_time = Get_start_time;
+    bmi_model->get_end_time = Get_end_time;
+    bmi_model->get_time_units = Get_time_units;
+    bmi_model->get_time_step = Get_time_step;
+
+    bmi_model->get_value = nullptr;
+    bmi_model->get_value_ptr = nullptr;
+    bmi_model->get_value_at_indices = nullptr;
+
+    bmi_model->set_value = nullptr;
+    bmi_model->set_value_at_indices = nullptr;
+
+    bmi_model->get_grid_size = Get_grid_size;
+    bmi_model->get_grid_rank = Get_grid_rank;
+    bmi_model->get_grid_type = Get_grid_type;
+
+    bmi_model->get_grid_shape = nullptr;
+    bmi_model->get_grid_spacing = Get_grid_spacing;
+    bmi_model->get_grid_origin = Get_grid_origin;
+
+    bmi_model->get_grid_x = nullptr;
+    bmi_model->get_grid_y = nullptr;
+    bmi_model->get_grid_z = nullptr;
+
+    bmi_model->get_grid_node_count = nullptr;
+    bmi_model->get_grid_edge_count = nullptr;
+    bmi_model->get_grid_face_count = nullptr;
+    bmi_model->get_grid_edge_nodes = nullptr;
+    bmi_model->get_grid_face_edges = nullptr;
+    bmi_model->get_grid_face_nodes = nullptr;
+    bmi_model->get_grid_nodes_per_face = nullptr;
+  }
+
+  return model;
+}
+
+
+#endif // defined(NEW_BMI_C_INTERFACE)

@@ -319,3 +319,40 @@ endif()
 # foreach (_variableName ${_variableNames})
 #   message(STATUS "${_variableName}=${${_variableName}}")
 # endforeach()
+
+#-----------------------------------------------------------------------------#
+
+# test ???
+add_executable(test_new_bmi_phreeqcrm)
+
+# sources
+target_sources(test_new_bmi_phreeqcrm PRIVATE test_new_bmi_phreeqcrm.c)
+
+# Turn off Incremental Linking for Debug and RelWithDebInfo
+if(MSVC)
+  target_link_options(test_new_bmi_phreeqcrm PRIVATE $<$<CONFIG:Debug,RelWithDebInfo>:/INCREMENTAL:NO>)
+endif()
+
+# library dependencies
+target_link_libraries(test_new_bmi_phreeqcrm PhreeqcRM::PhreeqcRM)
+
+add_test(test_new_bmi_phreeqcrm test_new_bmi_phreeqcrm)
+
+#-----------------------------------------------------------------------------#
+
+cmake_policy(SET CMP0057 NEW)
+
+include(GoogleTest)
+
+add_executable(
+  test_irf
+  test_irf.cpp
+)
+target_link_libraries(
+  test_irf
+  PhreeqcRM::PhreeqcRM
+  GTest::gtest_main
+  # gtest
+  # gtest_main
+)
+gtest_discover_tests(test_irf)
