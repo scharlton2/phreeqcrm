@@ -250,6 +250,8 @@ if(MSVC)
 endif()
 
 if(DEFINED SKBUILD)
+  # SKBUILD is defined when scikit-build-core is used to build python wheels (see pyproject.toml)
+
   # install _phreeqcrm.${Python_SOABI}${CMAKE_SHARED_MODULE_SUFFIX}
   # ie _phreeqcrm.cp38-win_amd64.pyd
   install(TARGETS ${PYTHON_TARGET_NAME} DESTINATION ${SKBUILD_PROJECT_NAME})
