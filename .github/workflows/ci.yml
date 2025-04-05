@@ -422,6 +422,11 @@ jobs:
       run: tar xvzf phreeqcrm-${{ env.VER_STRING }}.tar.gz
 
     - name: Configure with CMake
+      if: ${{ matrix.phreeqcrm_with_yaml_cpp != 'ON' }}
+      run: cmake -L -G Ninja -B build -S phreeqcrm-${{ env.VER_STRING }} -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DBUILD_SHARED_LIBS:BOOL=${{ matrix.build_shared_libs }} -DPHREEQCRM_WITH_YAML_CPP=${{ matrix.phreeqcrm_with_yaml_cpp }} -DPHREEQCRM_FORTRAN_TESTING:BOOL=ON
+
+    - name: Configure with CMake
+      if: ${{ matrix.phreeqcrm_with_yaml_cpp == 'ON' }}
       run: cmake -L -G Ninja -B build -S phreeqcrm-${{ env.VER_STRING }} -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DBUILD_SHARED_LIBS:BOOL=${{ matrix.build_shared_libs }} -DPHREEQCRM_WITH_YAML_CPP=${{ matrix.phreeqcrm_with_yaml_cpp }} -DPHREEQCRM_FORTRAN_TESTING:BOOL=ON -DPHREEQCRM_BUILD_PYTHON:BOOL=ON
 
     - name: Print phreeqcrm.pc
