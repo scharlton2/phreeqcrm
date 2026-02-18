@@ -78,3 +78,6 @@ builds/
 
 # CMakePresets build directories
 out/build/
+
+# setuptools_scm
+src/*/_version.py
